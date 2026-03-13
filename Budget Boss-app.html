@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FinQuest – Gamified Financial Education</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--surface:#111827;--card:#1a2235;--border:#2a3a55;
+  --gold:#f5c842;--gold-dim:#c99e2a;--teal:#22d3b0;--pink:#f43f7a;
+  --blue:#3b82f6;--purple:#a855f7;--green:#22c55e;
+  --text:#e8edf5;--muted:#6b7fa3;--radius:14px;
+  --shadow:0 8px 32px rgba(0,0,0,.5);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Syne',sans-serif}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ===== BUTTONS ===== */
+.btn{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;letter-spacing:.04em;padding:11px 26px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase;display:inline-flex;align-items:center;gap:7px}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:var(--gold);color:#0a0e1a}.btn-gold:hover{background:#ffd700;box-shadow:0 0 18px rgba(245,200,66,.4)}
+.btn-teal{background:var(--teal);color:#0a0e1a}.btn-teal:hover{box-shadow:0 0 18px rgba(34,211,176,.4)}
+.btn-pink{background:var(--pink);color:#fff}.btn-pink:hover{box-shadow:0 0 18px rgba(244,63,122,.4)}
+.btn-outline{background:transparent;border:2px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-ghost{background:transparent;color:var(--muted);padding:7px 14px}.btn-ghost:hover{color:var(--text)}
+.btn-sm{padding:7px 16px;font-size:.78rem}.btn-lg{padding:15px 38px;font-size:.95rem}
+.btn-disabled{opacity:.45;cursor:not-allowed}
+.w-full{width:100%;justify-content:center}
+
+/* ===== CARDS ===== */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+
+/* ===== BADGES ===== */
+.badge{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;padding:3px 11px;border-radius:999px;letter-spacing:.04em;text-transform:uppercase}
+.badge-gold{background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3)}
+.badge-teal{background:rgba(34,211,176,.15);color:var(--teal);border:1px solid rgba(34,211,176,.3)}
+.badge-pink{background:rgba(244,63,122,.15);color:var(--pink);border:1px solid rgba(244,63,122,.3)}
+.badge-purple{background:rgba(168,85,247,.15);color:var(--purple);border:1px solid rgba(168,85,247,.3)}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+
+/* ===== INPUTS ===== */
+.input-group{display:flex;flex-direction:column;gap:5px}
+.input-group label{font-size:.82rem;color:var(--muted);font-weight:500}
+.input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:11px 15px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;transition:border-color .2s;width:100%}
+.input:focus{outline:none;border-color:var(--gold)}
+.input::placeholder{color:var(--muted)}
+
+/* ===== PROGRESS ===== */
+.progress-bar{background:var(--border);border-radius:999px;height:7px;overflow:hidden}
+.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--gold),var(--teal));transition:width .5s ease}
+
+/* ===== LANDING ===== */
+.landing{min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.landing-bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(34,211,176,.08) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(245,200,66,.06) 0%,transparent 50%),radial-gradient(ellipse at 60% 80%,rgba(168,85,247,.07) 0%,transparent 50%),var(--bg)}
+.landing-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(245,200,66,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,200,66,.04) 1px,transparent 1px);background-size:60px 60px}
+.landing-content{position:relative;z-index:1;flex:1;display:flex;flex-direction:column}
+.landing-nav{display:flex;justify-content:space-between;align-items:center;padding:22px 48px}
+.logo{font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;color:var(--gold);letter-spacing:-.02em}
+.logo span{color:var(--teal)}
+.landing-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 24px;gap:24px}
+.hero-eyebrow{font-family:'Syne',sans-serif;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:8px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';width:38px;height:1px;background:var(--teal);opacity:.5}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,8vw,5.5rem);font-weight:800;line-height:1;letter-spacing:-.03em}
+.accent-gold{color:var(--gold)}.accent-teal{color:var(--teal)}
+.hero-sub{font-size:1.05rem;color:var(--muted);max-width:460px;line-height:1.75}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.hero-stats{display:flex;gap:44px;margin-top:10px}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--gold)}
+.stat-label{font-size:.78rem;color:var(--muted);margin-top:1px;text-align:center}
+.landing-features{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;padding:0 48px 56px;position:relative;z-index:1}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;transition:transform .2s,border-color .2s}
+.feature-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.feature-icon{font-size:1.9rem;margin-bottom:8px}
+.feature-card h4{font-size:.9rem;margin-bottom:5px}.feature-card p{font-size:.78rem;color:var(--muted)}
+
+/* ===== AUTH ===== */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative}
+.auth-bg{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(34,211,176,.06) 0%,transparent 70%),var(--bg);z-index:0}
+.auth-card{position:relative;z-index:1;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:38px;width:100%;max-width:410px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.auth-logo{text-align:center;margin-bottom:6px;font-size:1.9rem}
+.auth-title{font-size:1.55rem;font-weight:800;text-align:center;margin-bottom:3px}
+.auth-subtitle{font-size:.88rem;color:var(--muted);text-align:center;margin-bottom:26px}
+.auth-form{display:flex;flex-direction:column;gap:14px}
+.auth-switch{text-align:center;font-size:.85rem;color:var(--muted);margin-top:14px}
+.auth-switch button{background:none;border:none;color:var(--gold);cursor:pointer;font-weight:600;font-family:inherit}
+.auth-switch button:hover{text-decoration:underline}
+.error-msg{background:rgba(244,63,122,.1);border:1px solid rgba(244,63,122,.3);color:var(--pink);padding:9px 13px;border-radius:8px;font-size:.83rem}
+
+/* ===== LAYOUT ===== */
+.app-layout{display:flex;min-height:100vh}
+.sidebar{width:234px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:22px 14px;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
+.sidebar-logo{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:var(--gold);padding:6px 12px 22px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.sidebar-logo span{color:var(--teal)}
+.sidebar-nav{flex:1;display:flex;flex-direction:column;gap:3px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 15px;border-radius:10px;cursor:pointer;transition:all .2s;font-weight:500;font-size:.88rem;color:var(--muted);border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:rgba(245,200,66,.1);color:var(--gold)}
+.nav-icon{font-size:1.05rem;width:20px;text-align:center}
+.sidebar-footer{padding-top:14px;border-top:1px solid var(--border)}
+.user-mini{display:flex;align-items:center;gap:9px;padding:9px;border-radius:10px;background:var(--card)}
+.user-mini-avatar{font-size:1.35rem}
+.user-mini-info{flex:1;overflow:hidden}
+.user-mini-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-mini-pts{font-size:.72rem;color:var(--gold)}
+.main-content{margin-left:234px;flex:1;padding:30px;min-height:100vh}
+.mobile-header{display:none;position:fixed;top:0;left:0;right:0;background:var(--surface);border-bottom:1px solid var(--border);padding:11px 18px;z-index:200;align-items:center;justify-content:space-between}
+.hamburger{background:none;border:none;color:var(--text);font-size:1.35rem;cursor:pointer}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0;padding:74px 14px 22px}
+  .mobile-header{display:flex}
+  .landing-nav{padding:14px 18px}
+  .landing-features{padding:0 18px 36px}
+  .hero-stats{gap:22px}
+  .hero-title{font-size:2.4rem}
+}
+
+/* ===== DASHBOARD ===== */
+.page-header{margin-bottom:26px}
+.page-title{font-size:1.75rem;font-weight:800}
+.page-subtitle{color:var(--muted);font-size:.88rem;margin-top:3px}
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:26px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:7px;transition:border-color .2s}
+.stat-card:hover{border-color:var(--gold)}
+.stat-card-icon{font-size:1.5rem}.stat-card-label{font-size:.78rem;color:var(--muted)}
+.stat-card-value{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800}
+.stat-card-sub{font-size:.72rem;color:var(--muted)}
+.dashboard-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px}
+@media(max-width:860px){.dashboard-row{grid-template-columns:1fr}}
+.section-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.quick-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.quick-action{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.quick-action:hover{border-color:var(--gold);background:rgba(245,200,66,.05)}
+.quick-action-icon{font-size:1.45rem}.quick-action-label{font-size:.78rem;font-weight:600;color:var(--muted)}
+.recent-item{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--border)}
+.recent-item:last-child{border-bottom:none}
+.recent-icon{font-size:1.1rem;width:34px;height:34px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.recent-info{flex:1}
+.recent-name{font-size:.86rem;font-weight:500}.recent-sub{font-size:.73rem;color:var(--muted)}
+.recent-pts{font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;color:var(--gold)}
+
+/* ===== PROFILE ===== */
+.profile-header{display:flex;align-items:center;gap:22px;margin-bottom:26px;flex-wrap:wrap}
+.avatar-display{width:86px;height:86px;border-radius:50%;background:var(--card);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2.7rem;flex-shrink:0}
+.avatar-picker{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:10px}
+.avatar-opt{width:50px;height:50px;border-radius:50%;background:var(--bg);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.45rem;cursor:pointer;transition:all .2s}
+.avatar-opt:hover,.avatar-opt.sel{border-color:var(--gold);background:rgba(245,200,66,.1)}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:680px){.profile-grid{grid-template-columns:1fr}}
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;margin-top:10px}
+.badge-item{text-align:center;padding:11px 7px;background:var(--bg);border:1px solid var(--border);border-radius:10px;transition:border-color .2s}
+.badge-item.earned{border-color:var(--gold)}.badge-item.locked{opacity:.38}
+.badge-item-icon{font-size:1.55rem;margin-bottom:3px}.badge-item-name{font-size:.68rem;color:var(--muted)}
+
+/* ===== LESSONS ===== */
+.lessons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.lesson-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer}
+.lesson-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.lesson-card-hd{padding:18px;display:flex;align-items:center;gap:14px;position:relative}
+.lesson-icon-big{width:52px;height:52px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.75rem;flex-shrink:0}
+.lesson-card h3{font-size:.95rem;font-weight:700}
+.lesson-card p{font-size:.8rem;color:var(--muted);margin-top:3px;line-height:1.5}
+.lesson-card-ft{padding:11px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.lesson-pts{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--gold)}
+.lesson-detail{max-width:700px}
+.lesson-body{font-size:.92rem;line-height:1.8;color:var(--muted)}
+.lesson-body p{margin-bottom:11px}
+.highlight{background:rgba(245,200,66,.08);border-left:3px solid var(--gold);padding:11px 14px;border-radius:0 8px 8px 0;margin:14px 0;color:var(--text)}
+.quiz-q{font-size:1.05rem;font-weight:600;margin-bottom:18px}
+.quiz-opts{display:flex;flex-direction:column;gap:9px}
+.quiz-opt{padding:13px 17px;background:var(--bg);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:.88rem;text-align:left;color:var(--text);font-family:'DM Sans',sans-serif;width:100%}
+.quiz-opt:hover{border-color:var(--blue)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(34,197,94,.1);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--pink);background:rgba(244,63,122,.1);color:var(--pink)}
+.quiz-result{text-align:center;padding:28px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.quiz-result-icon{font-size:3.8rem}
+.pts-earned{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--gold)}
+
+/* ===== GAMES ===== */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.game-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;cursor:pointer;transition:transform .2s,border-color .2s;display:flex;flex-direction:column;gap:11px}
+.game-card:hover{transform:translateY(-4px);border-color:var(--teal)}
+.game-card-icon{font-size:2.4rem}
+.game-card h3{font-size:1.05rem;font-weight:700}
+.game-card p{font-size:.8rem;color:var(--muted);line-height:1.6}
+.game-card-ft{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.game-pts{font-family:'Syne',sans-serif;font-size:.82rem;color:var(--teal);font-weight:700}
+.diff-easy{background:rgba(34,197,94,.15);color:var(--green);font-size:.72rem;padding:2px 9px;border-radius:5px;font-weight:600}
+.diff-medium{background:rgba(245,200,66,.15);color:var(--gold);font-size:.72rem;padding:2px 9px;border-radius:5px;font-weight:600}
+.diff-hard{background:rgba(244,63,122,.15);color:var(--pink);font-size:.72rem;padding:2px 9px;border-radius:5px;font-weight:600}
+.game-wrapper{max-width:680px;margin:0 auto}
+.game-hd{display:flex;align-items:center;gap:11px;margin-bottom:22px}
+.game-back-btn{background:var(--card);border:1px solid var(--border);color:var(--text);padding:7px 11px;border-radius:8px;cursor:pointer;font-size:.95rem;font-family:'DM Sans',sans-serif}
+.game-score-bar{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:11px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+.score-label{font-size:.78rem;color:var(--muted)}.score-value{font-family:'Syne',sans-serif;font-weight:700;color:var(--gold)}
+
+/* Budget Builder */
+.budget-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;margin-bottom:7px}
+.bitem-info{display:flex;align-items:center;gap:9px}
+.bitem-icon{font-size:1.15rem}
+.bitem-name{font-size:.88rem;font-weight:500}.bitem-cat{font-size:.73rem;color:var(--muted)}
+.toggle-btn{width:42px;height:22px;border-radius:11px;border:none;cursor:pointer;transition:background .2s;position:relative;flex-shrink:0}
+.toggle-btn.on{background:var(--green)}.toggle-btn.off{background:var(--border)}
+.toggle-btn::after{content:'';position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:white;transition:left .2s}
+.toggle-btn.on::after{left:calc(100% - 19px)}.toggle-btn.off::after{left:3px}
+.budget-meter{margin:14px 0;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+.bm-row{display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:7px}
+.bm-row .lbl{color:var(--muted)}.bm-row .val{font-family:'Syne',sans-serif;font-weight:700}
+.over{color:var(--pink)}.under{color:var(--green)}
+
+/* Needs vs Wants */
+.nvw-item{display:flex;align-items:center;gap:13px;padding:13px 15px;background:var(--bg);border:2px solid var(--border);border-radius:12px;margin-bottom:9px;transition:border-color .2s}
+.nvw-item.correct{border-color:var(--green);background:rgba(34,197,94,.05)}
+.nvw-item.wrong{border-color:var(--pink);background:rgba(244,63,122,.05)}
+.nvw-icon{font-size:1.35rem}
+.nvw-name{flex:1;font-weight:500;font-size:.88rem}
+.nvw-btns{display:flex;gap:7px}
+.nvw-btn{padding:5px 13px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif}
+.nvw-btn.need.sel{background:var(--teal);border-color:var(--teal);color:#0a0e1a}
+.nvw-btn.want.sel{background:var(--pink);border-color:var(--pink);color:white}
+
+/* Investment Sim */
+.inv-chart{height:110px;display:flex;align-items:flex-end;gap:3px;padding:7px;background:var(--bg);border:1px solid var(--border);border-radius:10px;margin:14px 0}
+.inv-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .4s ease}
+.inv-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.inv-control label{font-size:.78rem;color:var(--muted);display:block;margin-bottom:5px}
+.inv-control select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem}
+
+/* Scam Detector */
+.scam-msg{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;font-size:.88rem;line-height:1.7}
+.scam-msg.scam{border-color:var(--pink)}.scam-msg.safe{border-color:var(--green)}
+.scam-sender{font-weight:700;color:var(--muted);margin-bottom:7px;font-size:.82rem}
+.scam-subj{font-weight:600;margin-bottom:7px;font-size:.9rem}
+.vote-btns{display:flex;gap:11px;justify-content:center;margin:14px 0}
+
+/* ===== SHOP ===== */
+.shop-hd-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.pts-display{background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);color:var(--gold);padding:9px 18px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem}
+.shop-tabs{display:flex;gap:7px;margin-bottom:22px;flex-wrap:wrap}
+.shop-tab{padding:7px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;font-size:.82rem;transition:all .2s}
+.shop-tab.active{background:var(--gold);color:#0a0e1a;border-color:var(--gold)}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(162px,1fr));gap:14px}
+.shop-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 14px;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:9px}
+.shop-item:hover{border-color:var(--gold)}.shop-item.owned{border-color:var(--teal)}
+.shop-item-icon{font-size:2.3rem}.shop-item-name{font-size:.86rem;font-weight:600}
+.shop-item-desc{font-size:.73rem;color:var(--muted)}
+.shop-item-price{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--gold)}
+.shop-item.owned .shop-item-price{color:var(--teal)}
+
+/* ===== LEADERBOARD ===== */
+.lb-podium{display:flex;justify-content:center;align-items:flex-end;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+.podium-item{text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+.podium-avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.9rem;border:3px solid var(--border)}
+.podium-1 .podium-avatar{border-color:var(--gold);width:76px;height:76px}
+.podium-2 .podium-avatar{border-color:#c0c0c0;width:64px;height:64px}
+.podium-3 .podium-avatar{border-color:#cd7f32;width:58px;height:58px}
+.podium-stand{padding:10px 22px 0;border-radius:9px 9px 0 0;font-family:'Syne',sans-serif;font-weight:800}
+.podium-1 .podium-stand{background:rgba(245,200,66,.2);height:74px;color:var(--gold);font-size:1.45rem}
+.podium-2 .podium-stand{background:rgba(192,192,192,.15);height:56px;color:#c0c0c0;font-size:1.15rem}
+.podium-3 .podium-stand{background:rgba(205,127,50,.15);height:42px;color:#cd7f32;font-size:.95rem}
+.podium-name{font-size:.8rem;font-weight:600}.podium-pts{font-size:.73rem;color:var(--muted)}
+.lb-list{max-width:580px;margin:0 auto}
+.lb-row{display:flex;align-items:center;gap:14px;padding:13px 15px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:7px;transition:border-color .2s}
+.lb-row.me{border-color:var(--gold);background:rgba(245,200,66,.05)}
+.lb-rank{font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;width:26px;color:var(--muted)}
+.lb-avi{font-size:1.45rem}.lb-name{flex:1;font-weight:500;font-size:.88rem}
+.lb-pts{font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);font-size:.88rem}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:11px;z-index:999;box-shadow:0 8px 28px rgba(0,0,0,.5);animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-icon{font-size:1.25rem}.toast-text{font-size:.86rem}
+.toast-pts{font-family:'Syne',sans-serif;font-weight:700;color:var(--gold);font-size:.95rem}
+
+/* Misc */
+.flex{display:flex}.items-center{align-items:center}.gap-1{gap:8px}.gap-2{gap:16px}
+.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mb-2{margin-bottom:16px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, createContext, useContext } = React;
+
+/* ─────────────────────────────────────────
+   DATA CONSTANTS
+───────────────────────────────────────── */
+const AVATARS = ['🦊','🐯','🦁','🐼','🐸','🐺','🦅','🦉','🐬','🦄'];
+
+const INITIAL_USER = {
+  uid:'demo-1', name:'Alex Rivera', email:'alex@example.com',
+  avatar:'🦊', points:350, completedLessons:['budgeting'],
+  completedGames:[], ownedItems:['badge_starter'], badges:['badge_starter'], rank:3
+};
+
+const LEADERBOARD = [
+  {uid:'u1',name:'Jordan K.',  avatar:'🐯',points:1240},
+  {uid:'u2',name:'Sam Chen',   avatar:'🦁',points:980},
+  {uid:'demo-1',name:'Alex Rivera',avatar:'🦊',points:350},
+  {uid:'u4',name:'Maya Patel', avatar:'🐼',points:290},
+  {uid:'u5',name:'Chris Lee',  avatar:'🐸',points:210},
+  {uid:'u6',name:'Dana Wu',    avatar:'🐺',points:175},
+  {uid:'u7',name:'Riley Fox',  avatar:'🦅',points:120},
+];
+
+const LESSONS_DATA = [
+  {id:'budgeting',title:'Budgeting 101',icon:'💰',color:'#22d3b0',bg:'rgba(34,211,176,.1)',points:50,
+   desc:'Learn how to track income and expenses to control your money.',
+   content:[
+     {type:'text',text:'A budget is a plan for your money. It helps you decide where your money goes instead of wondering where it went.'},
+     {type:'highlight',text:'💡 The 50/30/20 Rule: Spend 50% on needs, 30% on wants, and save 20% of your income.'},
+     {type:'text',text:'Start by listing all your income sources (salary, allowance, etc.), then list all your monthly expenses.'},
+     {type:'text',text:'If your expenses exceed your income, you need to earn more or cut back. Tracking helps you spot patterns!'},
+   ],
+   quiz:[
+     {q:'In the 50/30/20 rule, how much should you save?',options:['10%','20%','30%','50%'],correct:1},
+     {q:'What is the main goal of a budget?',options:['Spend more money','Plan where your money goes','Earn more income','Avoid taxes'],correct:1},
+     {q:'Income is $2,000 and expenses are $2,400. What should you do?',options:["Nothing, it's fine",'Take a loan monthly','Cut expenses or increase income','Ignore the difference'],correct:2},
+   ]
+  },
+  {id:'saving',title:'Saving Money',icon:'🏦',color:'#f5c842',bg:'rgba(245,200,66,.1)',points:60,
+   desc:'Discover why saving matters and strategies to build your savings.',
+   content:[
+     {type:'text',text:'Saving money means putting aside some of what you earn for future use. It builds security and helps you reach financial goals.'},
+     {type:'highlight',text:'⚡ Pay Yourself First: Transfer money to savings as soon as you get paid, before spending on anything else.'},
+     {type:'text',text:'Emergency Fund: Aim to save 3-6 months of living expenses. This protects you from unexpected events like job loss or medical bills.'},
+     {type:'text',text:'Automate your savings! Set up an automatic transfer so you save without thinking about it. Small amounts add up over time.'},
+   ],
+   quiz:[
+     {q:'What does "Pay Yourself First" mean?',options:['Buy things you want first','Save before spending','Give money to family','Pay bills early'],correct:1},
+     {q:'How many months of expenses should an emergency fund cover?',options:['1 month','2 months','3-6 months','12 months'],correct:2},
+     {q:'Which is the best saving strategy?',options:['Save whatever is left over','Never save','Automate monthly savings','Only save in December'],correct:2},
+   ]
+  },
+  {id:'investing',title:'Investment Basics',icon:'📈',color:'#a855f7',bg:'rgba(168,85,247,.1)',points:80,
+   desc:'Understand how to grow your money through smart investments.',
+   content:[
+     {type:'text',text:'Investing means putting your money to work to earn more money over time. Unlike saving, investing involves some risk but offers higher potential returns.'},
+     {type:'highlight',text:'🔑 Compound Interest: Earning interest on your interest. $1,000 at 7% annual return becomes ~$7,600 in 30 years!'},
+     {type:'text',text:'Common investments include: Stocks (owning a piece of a company), Bonds (lending money), and Index Funds (a basket of many stocks).'},
+     {type:'text',text:"Diversification means spreading money across different investments to reduce risk. Never put all your eggs in one basket!"},
+   ],
+   quiz:[
+     {q:'What is compound interest?',options:['Interest charged on loans','Earning interest on your interest','A type of bank fee','Fixed rate'],correct:1},
+     {q:'What does diversification mean?',options:['Investing in one company','Spreading investments to reduce risk','Spending on different things','Taking big risks'],correct:1},
+     {q:'What is an index fund?',options:['A single company stock','A government bond','A basket of many stocks','A savings account'],correct:2},
+   ]
+  },
+  {id:'scams',title:'Identifying Scams',icon:'🛡️',color:'#f43f7a',bg:'rgba(244,63,122,.1)',points:70,
+   desc:'Learn to recognize and avoid financial scams and fraud.',
+   content:[
+     {type:'text',text:'Financial scams are tricks to steal your money or personal information. They happen through email, phone, social media, or fake websites.'},
+     {type:'highlight',text:'🚨 Red Flags: "Too good to be true" offers, urgent pressure to act NOW, requests for personal info or gift cards as payment.'},
+     {type:'text',text:'Common scams: Phishing emails, fake job offers, romance scams, investment fraud ("guaranteed" returns), and lottery/prize scams.'},
+     {type:'text',text:"Protect yourself: Never share passwords or financial info. Verify who you're talking to. If unsure, hang up and call the official number directly."},
+   ],
+   quiz:[
+     {q:'You receive an email saying you won $1M lottery you never entered. It asks for bank details. What do you do?',options:['Provide details immediately',"Delete it — it's a scam",'Share with friends first','Send $50 to claim it'],correct:1},
+     {q:'Which is a RED FLAG for a scam?',options:['A company with a website','Pressure to "act NOW or miss out"','An official receipt','A return policy'],correct:1},
+     {q:'Someone asks you to pay via gift cards. This is:',options:['Normal payment','A common scam tactic','Better than cash','Totally secure'],correct:1},
+   ]
+  },
+];
+
+const SHOP_ITEMS = {
+  stickers:[
+    {id:'sticker_fire',icon:'🔥',name:'Fire Sticker',desc:'Hot deal finder',cost:20},
+    {id:'sticker_star',icon:'⭐',name:'Gold Star',desc:'Top performer',cost:25},
+    {id:'sticker_rocket',icon:'🚀',name:'Rocket Sticker',desc:'Fast saver',cost:30},
+    {id:'sticker_diamond',icon:'💎',name:'Diamond Sticker',desc:'Premium collector',cost:50},
+    {id:'sticker_money',icon:'💸',name:'Money Wings',desc:'Big spender',cost:35},
+    {id:'sticker_crown',icon:'👑',name:'Crown Sticker',desc:'Finance royalty',cost:80},
+  ],
+  avatars:[
+    {id:'av_dragon',icon:'🐲',name:'Dragon',desc:'Rare avatar',cost:100},
+    {id:'av_robot',icon:'🤖',name:'Finance Bot',desc:'Tech-savvy avatar',cost:80},
+    {id:'av_wizard',icon:'🧙',name:'Money Wizard',desc:'Magical finances',cost:120},
+    {id:'av_ninja',icon:'🥷',name:'Budget Ninja',desc:'Silent saver',cost:90},
+    {id:'av_alien',icon:'👽',name:'Alien Trader',desc:'Intergalactic wealth',cost:150},
+    {id:'av_phoenix',icon:'🦅',name:'Phoenix',desc:'Reborn rich',cost:200},
+  ],
+  badges:[
+    {id:'badge_vip',icon:'💼',name:'VIP Badge',desc:'Exclusive membership',cost:150},
+    {id:'badge_pro',icon:'🎓',name:'Finance Pro',desc:'Professional status',cost:200},
+    {id:'badge_legend',icon:'🏅',name:'Legend Badge',desc:'Hall of fame',cost:300},
+    {id:'badge_inv2',icon:'📊',name:'Investor Badge',desc:'Market master',cost:100},
+    {id:'badge_saver2',icon:'🏦',name:'Super Saver',desc:'Savings champion',cost:75},
+    {id:'badge_det',icon:'🔎',name:'Scam Detective',desc:'Fraud fighter',cost:60},
+  ],
+};
+
+const ALL_BADGES = [
+  {id:'badge_starter',icon:'🌱',name:'Starter',desc:'Joined FinQuest'},
+  {id:'badge_budgeter',icon:'💰',name:'Budgeter',desc:'Complete budgeting lesson'},
+  {id:'badge_saver',icon:'🏦',name:'Saver',desc:'Complete saving lesson'},
+  {id:'badge_investor',icon:'📈',name:'Investor',desc:'Complete investing lesson'},
+  {id:'badge_defender',icon:'🛡️',name:'Defender',desc:'Complete scam detection lesson'},
+  {id:'badge_gamer',icon:'🎮',name:'Gamer',desc:'Play all 4 games'},
+  {id:'badge_shopaholic',icon:'🛍️',name:'Shopper',desc:'Buy 3 items from shop'},
+  {id:'badge_master',icon:'👑',name:'Master',desc:'Complete everything'},
+];
+
+/* ─────────────────────────────────────────
+   CONTEXT
+───────────────────────────────────────── */
+const AppCtx = createContext(null);
+function useApp(){ return useContext(AppCtx); }
+
+/* ─────────────────────────────────────────
+   ROOT APP
+───────────────────────────────────────── */
+function App(){
+  const [page,setPage]   = useState('landing');
+  const [user,setUser]   = useState(null);
+  const [toast,setToast] = useState(null);
+
+  useEffect(()=>{
+    try{
+      const s = localStorage.getItem('fq_user');
+      if(s){ setUser(JSON.parse(s)); setPage('dashboard'); }
+    }catch(e){}
+  },[]);
+
+  useEffect(()=>{
+    if(user){ try{ localStorage.setItem('fq_user',JSON.stringify(user)); }catch(e){} }
+  },[user]);
+
+  function showToast(msg,pts=0){ setToast({msg,pts}); setTimeout(()=>setToast(null),3000); }
+
+  function addPoints(amt){
+    setUser(p=>({...p, points: p.points + amt}));
+    showToast('Great job! 🎉', amt);
+  }
+
+  function completeLesson(id){
+    setUser(p=>{
+      if(p.completedLessons.includes(id)) return p;
+      const cl=[...p.completedLessons,id];
+      const badgeMap={budgeting:'badge_budgeter',saving:'badge_saver',investing:'badge_investor',scams:'badge_defender'};
+      const newBadges=badgeMap[id]&&!p.badges.includes(badgeMap[id]) ? [...p.badges,badgeMap[id]] : p.badges;
+      return {...p, completedLessons:cl, badges:newBadges};
+    });
+  }
+
+  function completeGame(id){
+    setUser(p=>{
+      if(p.completedGames.includes(id)) return p;
+      const cg=[...p.completedGames,id];
+      const newBadges=cg.length>=4&&!p.badges.includes('badge_gamer') ? [...p.badges,'badge_gamer'] : p.badges;
+      return {...p, completedGames:cg, badges:newBadges};
+    });
+  }
+
+  function buyItem(item){
+    if(user.points < item.cost){ showToast("Not enough points! 😅"); return false; }
+    if(user.ownedItems.includes(item.id)){ showToast("Already owned!"); return false; }
+    setUser(p=>{
+      const owned=[...p.ownedItems,item.id];
+      const newBadges=owned.length>=4&&!p.badges.includes('badge_shopaholic') ? [...p.badges,'badge_shopaholic'] : p.badges;
+      return {...p, points:p.points-item.cost, ownedItems:owned, badges:newBadges};
+    });
+    showToast(`Bought: ${item.name}! 🎉`);
+    return true;
+  }
+
+  function handleLogin(email){ setUser({...INITIAL_USER,email}); setPage('dashboard'); }
+  function handleSignup(name,email){ setUser({...INITIAL_USER,name,email,points:50}); setPage('dashboard'); }
+  function handleLogout(){ try{localStorage.removeItem('fq_user');}catch(e){} setUser(null); setPage('landing'); }
+
+  const lb = LEADERBOARD.map(u=> u.uid==='demo-1' && user ? {...u,points:user.points,name:user.name,avatar:user.avatar} : u);
+
+  const ctx={page,setPage,user,setUser,leaderboard:lb,addPoints,completeLesson,completeGame,buyItem,showToast};
+
+  const authPages=['landing','login','signup'];
+
+  return(
+    <AppCtx.Provider value={ctx}>
+      {page==='landing' && <Landing onLogin={()=>setPage('login')} onSignup={()=>setPage('signup')}/>}
+      {page==='login'   && <LoginPage onLogin={handleLogin} onSwitch={()=>setPage('signup')} onBack={()=>setPage('landing')}/>}
+      {page==='signup'  && <SignupPage onSignup={handleSignup} onSwitch={()=>setPage('login')} onBack={()=>setPage('landing')}/>}
+
+      {user && !authPages.includes(page) && (
+        <div className="app-layout">
+          <Sidebar onLogout={handleLogout}/>
+          <main className="main-content">
+            {page==='dashboard'   && <DashboardPage/>}
+            {page==='profile'     && <ProfilePage/>}
+            {page==='lessons'     && <LessonsPage/>}
+            {page==='games'       && <GamesPage/>}
+            {page==='shop'        && <ShopPage/>}
+            {page==='leaderboard' && <LeaderboardPage/>}
+          </main>
+        </div>
+      )}
+
+      {toast && (
+        <div className="toast">
+          <span className="toast-icon">⭐</span>
+          <div>
+            <div className="toast-text">{toast.msg}</div>
+            {toast.pts>0 && <div className="toast-pts">+{toast.pts} pts</div>}
+          </div>
+        </div>
+      )}
+    </AppCtx.Provider>
+  );
+}
+
+/* ─────────────────────────────────────────
+   LANDING
+───────────────────────────────────────── */
+function Landing({onLogin,onSignup}){
+  return(
+    <div className="landing">
+      <div className="landing-bg"/><div className="landing-grid"/>
+      <div className="landing-content">
+        <nav className="landing-nav">
+          <div className="logo">Fin<span>Quest</span></div>
+          <div style={{display:'flex',gap:10}}>
+            <button className="btn btn-outline btn-sm" onClick={onLogin}>Log In</button>
+            <button className="btn btn-gold btn-sm" onClick={onSignup}>Sign Up Free</button>
+          </div>
+        </nav>
+        <section className="landing-hero">
+          <div className="hero-eyebrow">Level Up Your Money Skills</div>
+          <h1 className="hero-title">
+            Learn <span className="accent-gold">Finance</span><br/>
+            Through <span className="accent-teal">Play</span>
+          </h1>
+          <p className="hero-sub">Master budgeting, investing, and smart spending with interactive lessons, games, and real rewards. Finance finally made fun.</p>
+          <div className="hero-btns">
+            <button className="btn btn-gold btn-lg" onClick={onSignup}>🚀 Start for Free</button>
+            <button className="btn btn-outline btn-lg" onClick={onLogin}>I have an account</button>
+          </div>
+          <div className="hero-stats">
+            {[['4','Fun Games'],['4+','Lessons'],['∞','Rewards']].map(([n,l])=>(
+              <div key={l}><div className="stat-num">{n}</div><div className="stat-label">{l}</div></div>
+            ))}
+          </div>
+        </section>
+        <section className="landing-features">
+          {[
+            {icon:'📚',title:'Bite-sized Lessons',desc:'Learn budgeting, saving, investing & scam detection'},
+            {icon:'🎮',title:'Games & Challenges',desc:'Apply skills in fun simulations and mini-games'},
+            {icon:'🏆',title:'Earn Points',desc:'Complete quizzes and games to rack up rewards'},
+            {icon:'🛍️',title:'Spend in the Shop',desc:'Unlock avatars, stickers, and profile badges'},
+          ].map(f=>(
+            <div key={f.title} className="feature-card">
+              <div className="feature-icon">{f.icon}</div>
+              <h4>{f.title}</h4><p>{f.desc}</p>
+            </div>
+          ))}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   AUTH
+───────────────────────────────────────── */
+function LoginPage({onLogin,onSwitch,onBack}){
+  const [email,setEmail]=useState('');const [pass,setPass]=useState('');
+  const [err,setErr]=useState('');const [loading,setLoading]=useState(false);
+  async function submit(e){
+    e.preventDefault();setErr('');
+    if(!email||!pass){setErr('Please fill in all fields.');return;}
+    setLoading(true);
+    await new Promise(r=>setTimeout(r,500));
+    setLoading(false);
+    onLogin(email,pass);
+  }
+  return(
+    <div className="auth-page"><div className="auth-bg"/>
+    <div className="auth-card">
+      <button className="btn btn-ghost btn-sm" style={{marginBottom:8}} onClick={onBack}>← Back</button>
+      <div className="auth-logo">🏦</div>
+      <h2 className="auth-title">Welcome back</h2>
+      <p className="auth-subtitle">Log in to continue your journey</p>
+      {err&&<div className="error-msg" style={{marginBottom:12}}>{err}</div>}
+      <form className="auth-form" onSubmit={submit}>
+        <div className="input-group"><label>Email</label><input className="input" type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+        <div className="input-group"><label>Password</label><input className="input" type="password" placeholder="••••••••" value={pass} onChange={e=>setPass(e.target.value)}/></div>
+        <button className="btn btn-gold w-full" type="submit" disabled={loading}>{loading?'⏳ Logging in...':'🔓 Log In'}</button>
+      </form>
+      <div style={{textAlign:'center',fontSize:'.8rem',color:'var(--teal)',marginTop:10}}>💡 Demo: enter any email & password</div>
+      <div className="auth-switch">Don't have an account? <button onClick={onSwitch}>Sign up free →</button></div>
+    </div></div>
+  );
+}
+
+function SignupPage({onSignup,onSwitch,onBack}){
+  const [name,setName]=useState('');const [email,setEmail]=useState('');
+  const [pass,setPass]=useState('');const [conf,setConf]=useState('');
+  const [err,setErr]=useState('');const [loading,setLoading]=useState(false);
+  async function submit(e){
+    e.preventDefault();setErr('');
+    if(!name||!email||!pass){setErr('Please fill in all fields.');return;}
+    if(pass!==conf){setErr('Passwords do not match.');return;}
+    if(pass.length<4){setErr('Password too short.');return;}
+    setLoading(true);await new Promise(r=>setTimeout(r,500));setLoading(false);
+    onSignup(name,email,pass);
+  }
+  return(
+    <div className="auth-page"><div className="auth-bg"/>
+    <div className="auth-card">
+      <button className="btn btn-ghost btn-sm" style={{marginBottom:8}} onClick={onBack}>← Back</button>
+      <div className="auth-logo">🚀</div>
+      <h2 className="auth-title">Create account</h2>
+      <p className="auth-subtitle">Start your financial journey today — free!</p>
+      {err&&<div className="error-msg" style={{marginBottom:12}}>{err}</div>}
+      <form className="auth-form" onSubmit={submit}>
+        <div className="input-group"><label>Your Name</label><input className="input" type="text" placeholder="Alex Rivera" value={name} onChange={e=>setName(e.target.value)}/></div>
+        <div className="input-group"><label>Email</label><input className="input" type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+        <div className="input-group"><label>Password</label><input className="input" type="password" placeholder="Min. 4 characters" value={pass} onChange={e=>setPass(e.target.value)}/></div>
+        <div className="input-group"><label>Confirm Password</label><input className="input" type="password" placeholder="Repeat password" value={conf} onChange={e=>setConf(e.target.value)}/></div>
+        <button className="btn btn-gold w-full" type="submit" disabled={loading}>{loading?'⏳ Creating...':'✨ Create Account'}</button>
+      </form>
+      <div className="auth-switch">Already have an account? <button onClick={onSwitch}>Log in →</button></div>
+    </div></div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   SIDEBAR
+───────────────────────────────────────── */
+const NAV=[
+  {id:'dashboard',icon:'🏠',label:'Dashboard'},
+  {id:'lessons',icon:'📚',label:'Lessons'},
+  {id:'games',icon:'🎮',label:'Games'},
+  {id:'shop',icon:'🛍️',label:'Shop'},
+  {id:'leaderboard',icon:'🏆',label:'Leaderboard'},
+  {id:'profile',icon:'👤',label:'Profile'},
+];
+
+function Sidebar({onLogout}){
+  const {page,setPage,user}=useApp();
+  const [open,setOpen]=useState(false);
+  function go(id){setPage(id);setOpen(false);}
+  return(<>
+    <div className="mobile-header">
+      <div className="logo">Fin<span>Quest</span></div>
+      <button className="hamburger" onClick={()=>setOpen(!open)}>{open?'✕':'☰'}</button>
+    </div>
+    <aside className={`sidebar${open?' open':''}`}>
+      <div className="sidebar-logo">Fin<span>Quest</span></div>
+      <nav className="sidebar-nav">
+        {NAV.map(n=>(
+          <button key={n.id} className={`nav-item${page===n.id?' active':''}`} onClick={()=>go(n.id)}>
+            <span className="nav-icon">{n.icon}</span>{n.label}
+          </button>
+        ))}
+      </nav>
+      <div className="sidebar-footer">
+        <div className="user-mini">
+          <div className="user-mini-avatar">{user?.avatar||'👤'}</div>
+          <div className="user-mini-info">
+            <div className="user-mini-name">{user?.name||'User'}</div>
+            <div className="user-mini-pts">⭐ {user?.points||0} pts</div>
+          </div>
+          <button className="btn btn-ghost btn-sm" onClick={onLogout} style={{padding:'4px 8px'}} title="Log out">↩</button>
+        </div>
+      </div>
+    </aside>
+  </>);
+}
+
+/* ─────────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────────── */
+function DashboardPage(){
+  const {user,setPage}=useApp();
+  const done=(user.completedLessons?.length||0)+(user.completedGames?.length||0);
+  const pct=Math.round((done/8)*100);
+  return(
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">Hey {user.avatar} {user.name?.split(' ')[0]}!</h1>
+        <p className="page-subtitle">Ready to level up your money skills today?</p>
+      </div>
+      <div className="dashboard-grid">
+        {[
+          {icon:'⭐',label:'Total Points',val:user.points,color:'var(--gold)',sub:'Keep earning!'},
+          {icon:'📚',label:'Lessons Done',val:`${user.completedLessons?.length||0}/4`,color:'var(--teal)',sub:'Financial topics'},
+          {icon:'🎮',label:'Games Played',val:`${user.completedGames?.length||0}/4`,color:'var(--pink)',sub:'Mini-games'},
+          {icon:'🏆',label:'Rank',val:`#${user.rank||'—'}`,color:'var(--purple)',sub:'Leaderboard'},
+        ].map(s=>(
+          <div key={s.label} className="stat-card">
+            <div className="stat-card-icon">{s.icon}</div>
+            <div className="stat-card-label">{s.label}</div>
+            <div className="stat-card-value" style={{color:s.color}}>{s.val}</div>
+            <div className="stat-card-sub">{s.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div className="dashboard-row">
+        <div className="card">
+          <div className="section-title">📈 Your Progress</div>
+          <div style={{marginBottom:14}}>
+            <div style={{display:'flex',justifyContent:'space-between',fontSize:'.83rem',marginBottom:7}}>
+              <span style={{color:'var(--muted)'}}>Overall completion</span>
+              <span style={{fontWeight:700}}>{pct}%</span>
+            </div>
+            <div className="progress-bar"><div className="progress-fill" style={{width:`${pct}%`}}/></div>
+          </div>
+          <p style={{fontSize:'.83rem',color:'var(--muted)',lineHeight:1.7}}>🎯 Complete all lessons and games to earn the <strong style={{color:'var(--gold)'}}>Master Badge</strong>!</p>
+          <div style={{marginTop:14}}><button className="btn btn-teal btn-sm" onClick={()=>setPage('lessons')}>Continue Learning →</button></div>
+        </div>
+        <div className="card">
+          <div className="section-title">⚡ Quick Actions</div>
+          <div className="quick-action-grid">
+            {[['📚','Lessons','lessons'],['🎮','Play Game','games'],['🛍️','Shop','shop'],['🏆','Leaderboard','leaderboard']].map(([ic,lb,pg])=>(
+              <div key={lb} className="quick-action" onClick={()=>setPage(pg)}>
+                <div className="quick-action-icon">{ic}</div>
+                <div className="quick-action-label">{lb}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="card">
+        <div className="section-title">🕐 Recent Activity</div>
+        {[
+          {icon:'📚',name:'Budgeting 101',sub:'Lesson completed',pts:'+50 pts'},
+          {icon:'🎮',name:'Budget Builder',sub:'Game played',pts:'+30 pts'},
+          {icon:'🛍️',name:'Gold Star',sub:'Item purchased',pts:'-25 pts'},
+        ].map((it,i)=>(
+          <div key={i} className="recent-item">
+            <div className="recent-icon">{it.icon}</div>
+            <div className="recent-info"><div className="recent-name">{it.name}</div><div className="recent-sub">{it.sub}</div></div>
+            <div className="recent-pts">{it.pts}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   PROFILE
+───────────────────────────────────────── */
+function ProfilePage(){
+  const {user,setUser,showToast}=useApp();
+  const [editing,setEditing]=useState(false);
+  const [nameIn,setNameIn]=useState(user.name);
+  function saveName(){if(!nameIn.trim())return;setUser(p=>({...p,name:nameIn.trim()}));setEditing(false);showToast('Name updated! ✏️');}
+  function pickAv(av){setUser(p=>({...p,avatar:av}));showToast('Avatar changed! '+av);}
+  const pts=user.points||0;
+  const level=pts<200?1:pts<500?2:pts<1000?3:4;
+  const earned=user.badges||[];
+  return(
+    <div>
+      <div className="page-header"><h1 className="page-title">Your Profile</h1><p className="page-subtitle">Customize and track achievements</p></div>
+      <div className="profile-header">
+        <div className="avatar-display">{user.avatar}</div>
+        <div>
+          {editing?(
+            <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+              <input className="input" value={nameIn} onChange={e=>setNameIn(e.target.value)} style={{width:180}} autoFocus onKeyDown={e=>e.key==='Enter'&&saveName()}/>
+              <button className="btn btn-gold btn-sm" onClick={saveName}>Save</button>
+              <button className="btn btn-ghost btn-sm" onClick={()=>setEditing(false)}>Cancel</button>
+            </div>
+          ):(
+            <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+              <h2 style={{fontSize:'1.45rem',fontWeight:800}}>{user.name}</h2>
+              <button className="btn btn-ghost btn-sm" onClick={()=>setEditing(true)}>✏️ Edit</button>
+            </div>
+          )}
+          <p style={{color:'var(--muted)',fontSize:'.86rem',marginTop:3}}>{user.email}</p>
+          <div style={{display:'flex',gap:8,marginTop:7,flexWrap:'wrap'}}>
+            <span className="badge badge-gold">Level {level}</span>
+            <span className="badge badge-teal">⭐ {pts} pts</span>
+          </div>
+        </div>
+      </div>
+      <div className="profile-grid">
+        <div className="card">
+          <div className="section-title">🎨 Choose Avatar</div>
+          <div className="avatar-picker">
+            {AVATARS.map(av=>(
+              <div key={av} className={`avatar-opt${user.avatar===av?' sel':''}`} onClick={()=>pickAv(av)}>{av}</div>
+            ))}
+          </div>
+        </div>
+        <div className="card">
+          <div className="section-title">📊 Your Stats</div>
+          {[
+            {label:'Total Points',val:pts,col:'var(--gold)'},
+            {label:'Level',val:`Level ${level}`,col:'var(--teal)'},
+            {label:'Lessons Completed',val:`${user.completedLessons?.length||0} / 4`,col:'var(--blue)'},
+            {label:'Games Played',val:`${user.completedGames?.length||0} / 4`,col:'var(--pink)'},
+            {label:'Items Owned',val:user.ownedItems?.length||0,col:'var(--purple)'},
+            {label:'Badges Earned',val:earned.length,col:'var(--green)'},
+          ].map(s=>(
+            <div key={s.label} className="recent-item">
+              <div className="recent-name" style={{flex:1}}>{s.label}</div>
+              <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,color:s.col}}>{s.val}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card" style={{marginTop:16}}>
+        <div className="section-title">🏅 Badges</div>
+        <div className="badges-grid">
+          {ALL_BADGES.map(b=>(
+            <div key={b.id} className={`badge-item${earned.includes(b.id)?' earned':' locked'}`} title={b.desc}>
+              <div className="badge-item-icon">{earned.includes(b.id)?b.icon:'🔒'}</div>
+              <div className="badge-item-name">{b.name}</div>
+            </div>
+          ))}
+        </div>
+        <p style={{fontSize:'.78rem',color:'var(--muted)',marginTop:10}}>Complete lessons, games and shop activities to unlock all badges!</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   LESSONS
+───────────────────────────────────────── */
+function LessonsPage(){
+  const {user}=useApp();
+  const [view,setView]=useState('list');
+  const [sel,setSel]=useState(null);
+
+  if(view==='lesson'&&sel) return <LessonDetail lesson={sel} onBack={()=>setView('list')} onQuiz={()=>setView('quiz')}/>;
+  if(view==='quiz'&&sel)   return <Quiz lesson={sel} onBack={()=>setView('lesson')} onDone={()=>setView('result')}/>;
+  if(view==='result'&&sel) return <LessonResult lesson={sel} onBack={()=>setView('list')}/>;
+
+  return(
+    <div>
+      <div className="page-header"><h1 className="page-title">📚 Lessons</h1><p className="page-subtitle">Learn financial skills and earn points by completing quizzes</p></div>
+      <div className="lessons-grid">
+        {LESSONS_DATA.map(l=>{
+          const done=user.completedLessons?.includes(l.id);
+          return(
+            <div key={l.id} className="lesson-card" onClick={()=>{setSel(l);setView('lesson');}}>
+              <div className="lesson-card-hd">
+                <div className="lesson-icon-big" style={{background:l.bg,color:l.color}}>{l.icon}</div>
+                <div><h3>{l.title}</h3><p>{l.desc}</p></div>
+                {done&&<span style={{position:'absolute',top:11,right:11,fontSize:'1.15rem'}}>✅</span>}
+              </div>
+              <div className="lesson-card-ft">
+                <span className="lesson-pts">⭐ +{l.points} pts</span>
+                <span className={`badge badge-${done?'green':'teal'}`}>{done?'Completed':'Start'}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function LessonDetail({lesson,onBack,onQuiz}){
+  return(
+    <div className="lesson-detail">
+      <div className="page-header">
+        <button className="btn btn-ghost btn-sm" style={{marginBottom:8}} onClick={onBack}>← All Lessons</button>
+        <div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>
+          <div style={{fontSize:'1.9rem',width:52,height:52,borderRadius:13,background:lesson.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>{lesson.icon}</div>
+          <div><h1 className="page-title">{lesson.title}</h1><span className="badge badge-gold" style={{marginTop:5,display:'inline-block'}}>⭐ +{lesson.points} pts on completion</span></div>
+        </div>
+      </div>
+      <div className="card">
+        <div className="lesson-body">
+          {lesson.content.map((b,i)=>(
+            b.type==='highlight'
+              ? <div key={i} className="highlight">{b.text}</div>
+              : <p key={i}>{b.text}</p>
+          ))}
+        </div>
+        <div style={{marginTop:22,display:'flex',gap:11,flexWrap:'wrap'}}>
+          <button className="btn btn-gold" onClick={onQuiz}>📝 Take Quiz & Earn Points</button>
+          <button className="btn btn-ghost" onClick={onBack}>Back</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Quiz({lesson,onBack,onDone}){
+  const {addPoints,completeLesson,user}=useApp();
+  const [cur,setCur]=useState(0);
+  const [sel,setSel]=useState(null);
+  const [score,setScore]=useState(0);
+  const [answered,setAnswered]=useState(false);
+  const q=lesson.quiz[cur];
+  const isLast=cur===lesson.quiz.length-1;
+  const already=user.completedLessons?.includes(lesson.id);
+
+  function pick(i){
+    if(answered)return;
+    setSel(i);setAnswered(true);
+    if(i===q.correct) setScore(s=>s+1);
+  }
+
+  function next(){
+    const curCorrect=sel===q.correct?1:0;
+    if(isLast){
+      if(!already){
+        const finalScore=score+curCorrect;
+        const pts=Math.round((finalScore/lesson.quiz.length)*lesson.points);
+        addPoints(pts);completeLesson(lesson.id);
+      }
+      onDone();
+    } else {
+      setCur(c=>c+1);setSel(null);setAnswered(false);
+    }
+  }
+
+  return(
+    <div style={{maxWidth:580,margin:'0 auto'}}>
+      <div className="page-header">
+        <button className="btn btn-ghost btn-sm" style={{marginBottom:8}} onClick={onBack}>← Back to Lesson</button>
+        <h1 className="page-title">Quiz: {lesson.title}</h1>
+        <p className="page-subtitle">Question {cur+1} of {lesson.quiz.length}</p>
+      </div>
+      <div className="progress-bar" style={{marginBottom:18}}>
+        <div className="progress-fill" style={{width:`${(cur/lesson.quiz.length)*100}%`}}/>
+      </div>
+      <div className="card">
+        <div className="quiz-q">{q.q}</div>
+        <div className="quiz-opts">
+          {q.options.map((opt,i)=>{
+            let cls='quiz-opt';
+            if(answered){if(i===q.correct)cls+=' correct';else if(i===sel)cls+=' wrong';}
+            return <button key={i} className={cls} onClick={()=>pick(i)}>{['A','B','C','D'][i]}. {opt}</button>;
+          })}
+        </div>
+        {answered&&(
+          <div style={{marginTop:18}}>
+            {sel===q.correct
+              ? <p style={{color:'var(--green)',fontWeight:600}}>✅ Correct! Well done.</p>
+              : <p style={{color:'var(--pink)',fontWeight:600}}>❌ Incorrect. Correct: {q.options[q.correct]}</p>
+            }
+            <button className="btn btn-gold" style={{marginTop:12}} onClick={next}>
+              {isLast?'See Results →':'Next Question →'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LessonResult({lesson,onBack}){
+  const {user}=useApp();
+  const already=user.completedLessons?.includes(lesson.id);
+  return(
+    <div style={{maxWidth:500,margin:'0 auto'}}>
+      <div className="card">
+        <div className="quiz-result">
+          <div className="quiz-result-icon">🎉</div>
+          <h3>Lesson Complete!</h3>
+          <p style={{color:'var(--muted)'}}>You finished <strong>{lesson.title}</strong></p>
+          {!already
+            ? <div className="pts-earned">+{lesson.points} pts earned!</div>
+            : <p style={{color:'var(--muted)',fontSize:'.86rem'}}>Already completed — no duplicate points.</p>
+          }
+          <button className="btn btn-teal" onClick={onBack}>← Back to Lessons</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   GAMES HUB
+───────────────────────────────────────── */
+const GAMES_META=[
+  {id:'budget-builder',title:'Budget Builder',icon:'💰',desc:'Manage a $2,000 monthly budget. Toggle expenses and try to balance your finances.',pts:40,diff:'easy'},
+  {id:'needs-vs-wants',title:'Needs vs Wants',icon:'🤔',desc:'Categorize everyday items as essential needs or optional wants.',pts:40,diff:'easy'},
+  {id:'investment-sim',title:'Investment Simulator',icon:'📈',desc:'Simulate how your money grows with different strategies and time horizons.',pts:35,diff:'medium'},
+  {id:'scam-detector',title:'Scam Detector',icon:'🛡️',desc:'Analyze real-looking messages and identify which ones are scams.',pts:50,diff:'hard'},
+];
+
+function GamesPage(){
+  const {user}=useApp();
+  const [active,setActive]=useState(null);
+
+  if(active){
+    const G = active.id==='budget-builder' ? BudgetBuilderGame
+             : active.id==='needs-vs-wants' ? NeedsVsWantsGame
+             : active.id==='investment-sim' ? InvestmentSimGame
+             : ScamDetectorGame;
+    return(
+      <div className="game-wrapper">
+        <div className="game-hd">
+          <button className="game-back-btn" onClick={()=>setActive(null)}>←</button>
+          <div>
+            <h2 style={{fontSize:'1.25rem',fontWeight:800}}>{active.icon} {active.title}</h2>
+            <span className="badge badge-teal">⭐ Up to {active.pts} pts</span>
+          </div>
+        </div>
+        <div className="game-score-bar">
+          <span className="score-label">Your points:</span>
+          <span className="score-value">⭐ {user.points}</span>
+        </div>
+        <G onBack={()=>setActive(null)}/>
+      </div>
+    );
+  }
+
+  return(
+    <div>
+      <div className="page-header"><h1 className="page-title">🎮 Games</h1><p className="page-subtitle">Learn financial skills through fun games. Earn points for playing!</p></div>
+      <div className="games-grid">
+        {GAMES_META.map(g=>{
+          const played=user.completedGames?.includes(g.id);
+          return(
+            <div key={g.id} className="game-card" onClick={()=>setActive(g)}>
+              <div className="game-card-icon">{g.icon}</div>
+              <h3>{g.title}</h3><p>{g.desc}</p>
+              <div className="game-card-ft">
+                <span className="game-pts">⭐ +{g.pts} pts</span>
+                <div style={{display:'flex',gap:5,alignItems:'center'}}>
+                  {played&&<span className="badge badge-green" style={{fontSize:'.63rem'}}>Played ✓</span>}
+                  <span className={`diff-${g.diff}`}>{g.diff}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="card" style={{marginTop:18}}>
+        <div className="section-title">🎯 Game Progress</div>
+        <div style={{display:'flex',gap:22,flexWrap:'wrap'}}>
+          <div><div style={{color:'var(--muted)',fontSize:'.78rem'}}>Games Played</div><div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:'1.4rem',color:'var(--teal)'}}>{user.completedGames?.length||0} / 4</div></div>
+          <div><div style={{color:'var(--muted)',fontSize:'.78rem'}}>Your Points</div><div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:'1.4rem',color:'var(--gold)'}}>⭐ {user.points}</div></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   GAME 1: BUDGET BUILDER
+───────────────────────────────────────── */
+const BUDGET_INCOME=2000;
+const BUDGET_EXPENSES=[
+  {id:'rent',name:'Rent',cost:800,cat:'Need',icon:'🏠'},
+  {id:'groceries',name:'Groceries',cost:300,cat:'Need',icon:'🛒'},
+  {id:'transport',name:'Transport',cost:150,cat:'Need',icon:'🚌'},
+  {id:'internet',name:'Internet',cost:50,cat:'Need',icon:'🌐'},
+  {id:'gym',name:'Gym Membership',cost:60,cat:'Want',icon:'💪'},
+  {id:'streaming',name:'Streaming Apps',cost:30,cat:'Want',icon:'📺'},
+  {id:'dining',name:'Dining Out',cost:200,cat:'Want',icon:'🍕'},
+  {id:'shopping',name:'Shopping',cost:150,cat:'Want',icon:'👟'},
+  {id:'gaming',name:'Games/Hobbies',cost:80,cat:'Want',icon:'🎮'},
+  {id:'savings',name:'Savings Goal',cost:200,cat:'Save',icon:'💰'},
+];
+
+function BudgetBuilderGame({onBack}){
+  const {addPoints,completeGame,user}=useApp();
+  const [active,setActive]=useState(()=>Object.fromEntries(BUDGET_EXPENSES.map(e=>[e.id,true])));
+  const [result,setResult]=useState(null);
+
+  const total=BUDGET_EXPENSES.filter(e=>active[e.id]).reduce((s,e)=>s+e.cost,0);
+  const leftover=BUDGET_INCOME-total;
+
+  function submit(){
+    let score=0;const fb=[];
+    const missedNeeds=BUDGET_EXPENSES.filter(e=>e.cat==='Need'&&!active[e.id]);
+    if(missedNeeds.length===0){score+=30;fb.push('✅ All essential needs included!');}
+    else fb.push(`❌ Missed needs: ${missedNeeds.map(n=>n.name).join(', ')}`);
+    if(leftover>=0){score+=40;fb.push('✅ Budget balanced!');}
+    else fb.push(`❌ Overspent by $${Math.abs(leftover)}!`);
+    if(active['savings']){score+=30;fb.push('✅ Savings goal included!');}
+    else fb.push('⚠️ Tip: Always include a savings goal!');
+    const pts=Math.round((score/100)*40);
+    setResult({score,fb,pts,leftover});
+    if(!user.completedGames?.includes('budget-builder')){addPoints(pts);completeGame('budget-builder');}
+  }
+
+  if(result) return(
+    <div className="card"><div className="quiz-result">
+      <div className="quiz-result-icon">{result.score>=70?'🎉':'📋'}</div>
+      <h3>{result.score>=70?'Great Budget!':'Room to Improve'}</h3>
+      <div className="pts-earned">+{result.pts} pts</div>
+      <div style={{textAlign:'left',width:'100%',marginTop:8}}>
+        {result.fb.map((f,i)=><p key={i} style={{fontSize:'.86rem',marginBottom:5}}>{f}</p>)}
+        <p style={{fontSize:'.86rem',color:'var(--teal)',marginTop:7}}>Leftover: <strong>${result.leftover}</strong></p>
+      </div>
+      <button className="btn btn-gold" onClick={onBack}>← Back to Games</button>
+    </div></div>
+  );
+
+  return(
+    <div>
+      <div className="budget-meter">
+        <div className="bm-row"><span className="lbl">Monthly Income</span><span className="val" style={{color:'var(--green)'}}>$2,000</span></div>
+        <div className="bm-row"><span className="lbl">Total Expenses</span><span className={`val${total>BUDGET_INCOME?' over':''}`}>${total}</span></div>
+        <div className="bm-row"><span className="lbl">Balance</span><span className={`val${leftover<0?' over':' under'}`}>{leftover>=0?'+':''}{leftover}</span></div>
+        <div className="progress-bar" style={{marginTop:7}}>
+          <div className="progress-fill" style={{width:`${Math.min((total/BUDGET_INCOME)*100,100)}%`,background:total>BUDGET_INCOME?'var(--pink)':undefined}}/>
+        </div>
+      </div>
+      <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:14}}>Toggle items on/off to build your ideal monthly budget. Stay within income and include savings!</p>
+      {BUDGET_EXPENSES.map(item=>(
+        <div key={item.id} className="budget-item">
+          <div className="bitem-info">
+            <span className="bitem-icon">{item.icon}</span>
+            <div>
+              <div className="bitem-name">{item.name}</div>
+              <div className="bitem-cat">
+                <span className={`badge badge-${item.cat==='Need'?'teal':item.cat==='Save'?'gold':'pink'}`} style={{fontSize:'.62rem'}}>{item.cat}</span>
+                {' '}<span style={{fontSize:'.78rem',color:'var(--muted)'}}>${item.cost}/mo</span>
+              </div>
+            </div>
+          </div>
+          <button className={`toggle-btn${active[item.id]?' on':' off'}`} onClick={()=>setActive(p=>({...p,[item.id]:!p[item.id]}))}/>
+        </div>
+      ))}
+      <button className="btn btn-gold w-full" style={{marginTop:16}} onClick={submit}>Submit My Budget →</button>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   GAME 2: NEEDS VS WANTS
+───────────────────────────────────────── */
+const NVW_ITEMS=[
+  {id:1,icon:'🏠',name:'Rent/Shelter',ans:'need'},{id:2,icon:'🍎',name:'Food & Groceries',ans:'need'},
+  {id:3,icon:'💊',name:'Medication',ans:'need'},{id:4,icon:'👟',name:'Designer Sneakers',ans:'want'},
+  {id:5,icon:'📱',name:'Latest iPhone',ans:'want'},{id:6,icon:'🌐',name:'Basic Internet',ans:'need'},
+  {id:7,icon:'☕',name:'Daily Coffee Shop',ans:'want'},{id:8,icon:'💡',name:'Electricity',ans:'need'},
+  {id:9,icon:'🎮',name:'Video Games',ans:'want'},{id:10,icon:'🚿',name:'Water/Plumbing',ans:'need'},
+  {id:11,icon:'👗',name:'Fashion Clothes',ans:'want'},{id:12,icon:'🎵',name:'Music Subscription',ans:'want'},
+];
+
+function NeedsVsWantsGame({onBack}){
+  const {addPoints,completeGame,user}=useApp();
+  const [answers,setAnswers]=useState({});
+  const [submitted,setSubmitted]=useState(false);
+  const [result,setResult]=useState(null);
+
+  function setAns(id,val){if(submitted)return;setAnswers(p=>({...p,[id]:val}));}
+
+  function submit(){
+    const all=NVW_ITEMS.every(i=>answers[i.id]);
+    if(!all){alert('Please categorize all items first!');return;}
+    const correct=NVW_ITEMS.filter(i=>answers[i.id]===i.ans).length;
+    const pts=Math.round((correct/NVW_ITEMS.length)*40);
+    setResult({correct,total:NVW_ITEMS.length,pts});
+    setSubmitted(true);
+    if(!user.completedGames?.includes('needs-vs-wants')){addPoints(pts);completeGame('needs-vs-wants');}
+  }
+
+  if(result) return(
+    <div className="card"><div className="quiz-result">
+      <div className="quiz-result-icon">{result.correct>=10?'🎯':'📋'}</div>
+      <h3>{result.correct} / {result.total} Correct!</h3>
+      <div className="pts-earned">+{result.pts} pts</div>
+      <p style={{fontSize:'.86rem',color:'var(--muted)',maxWidth:320,textAlign:'center'}}>
+        {result.correct>=10?'Excellent! You know the difference!':'Remember: Needs are essential for survival. Wants make life nicer but aren\'t required.'}
+      </p>
+      <button className="btn btn-gold" onClick={onBack}>← Back to Games</button>
+    </div></div>
+  );
+
+  const answeredCount=Object.keys(answers).length;
+  return(
+    <div>
+      <div className="budget-meter" style={{marginBottom:14}}>
+        <div className="bm-row"><span className="lbl">Categorized</span><span className="val">{answeredCount} / {NVW_ITEMS.length}</span></div>
+        <div className="progress-bar"><div className="progress-fill" style={{width:`${(answeredCount/NVW_ITEMS.length)*100}%`}}/></div>
+      </div>
+      <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:14}}>Is each item a <strong style={{color:'var(--teal)'}}>Need</strong> (essential for basic living) or a <strong style={{color:'var(--pink)'}}>Want</strong> (nice to have)?</p>
+      {NVW_ITEMS.map(item=>{
+        const chosen=answers[item.id];
+        let cls='nvw-item';
+        if(submitted) cls+=chosen===item.ans?' correct':' wrong';
+        return(
+          <div key={item.id} className={cls}>
+            <span className="nvw-icon">{item.icon}</span>
+            <span className="nvw-name">{item.name}</span>
+            <div className="nvw-btns">
+              <button className={`nvw-btn need${chosen==='need'?' sel':''}`} onClick={()=>setAns(item.id,'need')}>Need</button>
+              <button className={`nvw-btn want${chosen==='want'?' sel':''}`} onClick={()=>setAns(item.id,'want')}>Want</button>
+            </div>
+            {submitted&&chosen!==item.ans&&<span style={{fontSize:'.73rem',color:'var(--pink)',marginLeft:7}}>→ {item.ans}</span>}
+          </div>
+        );
+      })}
+      <button className={`btn btn-gold w-full${answeredCount<NVW_ITEMS.length?' btn-disabled':''}`} style={{marginTop:14}} onClick={submit} disabled={answeredCount<NVW_ITEMS.length}>
+        {answeredCount<NVW_ITEMS.length?`Categorize ${NVW_ITEMS.length-answeredCount} more...`:'Check Answers →'}
+      </button>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   GAME 3: INVESTMENT SIMULATOR
+───────────────────────────────────────── */
+const STRATS={
+  conservative:{label:'🏦 Conservative (Bonds)',rate:0.04,risk:'Low',color:'#22d3b0'},
+  balanced:{label:'⚖️ Balanced (Mix)',rate:0.07,risk:'Medium',color:'#f5c842'},
+  aggressive:{label:'🚀 Aggressive (Stocks)',rate:0.12,risk:'High',color:'#a855f7'},
+  crypto:{label:'💎 Crypto (Very High Risk)',rate:0.25,risk:'Very High',color:'#f43f7a'},
+};
+
+function InvestmentSimGame({onBack}){
+  const {addPoints,completeGame,user}=useApp();
+  const [strat,setStrat]=useState('balanced');
+  const [amount,setAmount]=useState(1000);
+  const [years,setYears]=useState(10);
+  const [result,setResult]=useState(null);
+
+  function simulate(){
+    const s=STRATS[strat];
+    const final=amount*Math.pow(1+s.rate,years);
+    const growth=final-amount;
+    const pctGain=((growth/amount)*100).toFixed(0);
+    const step=Math.ceil(years/8);
+    const chartData=[];
+    for(let y=step;y<=years;y+=step) chartData.push({year:y,value:amount*Math.pow(1+s.rate,y)});
+    setResult({final,growth,pctGain,s,chartData});
+    if(!user.completedGames?.includes('investment-sim')){addPoints(35);completeGame('investment-sim');}
+  }
+
+  const maxVal=result?.chartData?.length?Math.max(...result.chartData.map(d=>d.value)):1;
+
+  return(
+    <div>
+      <p style={{fontSize:'.83rem',color:'var(--muted)',marginBottom:18}}>Choose your investment strategy, amount, and time period to see how your money could grow!</p>
+      <div className="inv-controls">
+        <div className="inv-control">
+          <label>Strategy</label>
+          <select value={strat} onChange={e=>{setStrat(e.target.value);setResult(null);}}>
+            {Object.entries(STRATS).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}
+          </select>
+        </div>
+        <div className="inv-control">
+          <label>Initial Amount</label>
+          <select value={amount} onChange={e=>{setAmount(+e.target.value);setResult(null);}}>
+            {[500,1000,5000,10000].map(a=><option key={a} value={a}>${a.toLocaleString()}</option>)}
+          </select>
+        </div>
+        <div className="inv-control">
+          <label>Time Period</label>
+          <select value={years} onChange={e=>{setYears(+e.target.value);setResult(null);}}>
+            {[1,5,10,20,30].map(y=><option key={y} value={y}>{y} year{y>1?'s':''}</option>)}
+          </select>
+        </div>
+        <div className="inv-control">
+          <label>Risk Level</label>
+          <div style={{padding:'8px 11px',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,fontSize:'.86rem',color:STRATS[strat].color,fontWeight:600}}>
+            {STRATS[strat].risk} Risk
+          </div>
+        </div>
+      </div>
+      <button className="btn btn-gold w-full" onClick={simulate}>📊 Simulate Investment →</button>
+
+      {result&&(
+        <div style={{marginTop:18}}>
+          <div style={{display:'flex',justifyContent:'space-between',marginBottom:7,fontSize:'.83rem'}}>
+            <span style={{color:'var(--muted)'}}>Growth over {years} years</span>
+            <span style={{color:result.s.color,fontWeight:600}}>{result.s.rate*100}% annual return</span>
+          </div>
+          <div className="inv-chart">
+            {result.chartData.map((d,i)=>(
+              <div key={i} style={{display:'flex',flexDirection:'column',alignItems:'center',flex:1,gap:3}}>
+                <div className="inv-bar" style={{height:`${(d.value/maxVal)*96}px`,background:result.s.color,opacity:.55+(i/result.chartData.length)*.45,width:'100%'}}/>
+                <span style={{fontSize:'.58rem',color:'var(--muted)'}}>Y{d.year}</span>
+              </div>
+            ))}
+          </div>
+          <div className="card" style={{marginTop:14}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,textAlign:'center'}}>
+              <div><div style={{color:'var(--muted)',fontSize:'.78rem'}}>Initial</div><div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:'1.15rem'}}>${amount.toLocaleString()}</div></div>
+              <div><div style={{color:'var(--muted)',fontSize:'.78rem'}}>Final Value</div><div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:'1.15rem',color:result.s.color}}>${result.final.toLocaleString('en',{maximumFractionDigits:0})}</div></div>
+              <div><div style={{color:'var(--muted)',fontSize:'.78rem'}}>Growth</div><div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:'1.15rem',color:'var(--green)'}}>+{result.pctGain}%</div></div>
+            </div>
+            <div style={{marginTop:11,padding:11,background:'var(--bg)',borderRadius:8,fontSize:'.8rem',color:'var(--muted)'}}>
+              💡 Compound interest at work! Your ${amount.toLocaleString()} could become ${result.final.toLocaleString('en',{maximumFractionDigits:0})} in {years} years.
+            </div>
+            <div style={{textAlign:'center',marginTop:11}}>
+              <div className="pts-earned" style={{fontSize:'1.15rem'}}>+35 pts earned!</div>
+              <button className="btn btn-ghost" style={{marginTop:8}} onClick={onBack}>← Back to Games</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   GAME 4: SCAM DETECTOR
+───────────────────────────────────────── */
+const SCAM_MSGS=[
+  {id:1,sender:'📧 no-reply@lottery-winner.net',subj:'CONGRATULATIONS! You won $500,000!',body:"Dear Lucky Winner, You have been selected to receive $500,000! To claim your prize, send us your bank account details and a $99 processing fee via gift card. Act NOW — offer expires in 24 hours!",isScam:true,flags:['gift card payment','unsolicited prize','upfront fee']},
+  {id:2,sender:'📧 statement@bankofamerica.com',subj:'Your October Statement is Ready',body:"Your monthly statement for account ending in ****1234 is now available. Log in at bankofamerica.com to view it. If you didn't request this, please visit our security center.",isScam:false,flags:[]},
+  {id:3,sender:'📱 SMS: +1-888-555-0199',subj:'Job Offer — $5,000/week working from home!',body:"Hi! We found your resume online. We're offering $5,000/week to work just 2 hours per day from home reshipping packages. No experience needed. Reply YES to start today!",isScam:true,flags:['unrealistic pay','reshipping scam','no interview needed']},
+  {id:4,sender:'📧 receipts@amazon.com',subj:'Your Amazon order has shipped',body:"Hello, your order #112-3456789 has shipped and will arrive Thursday. Track your package at amazon.com/orders. Questions? Contact customer service through your account.",isScam:false,flags:[]},
+  {id:5,sender:'📧 security@paypa1-alerts.com',subj:'URGENT: Your account is suspended!',body:"Your PayPal account has been LIMITED. You must verify your identity within 24 hours or your account will be PERMANENTLY CLOSED. Click here to verify now: paypa1-secure-login.net",isScam:true,flags:['fake domain (paypa1)','urgency/fear tactics','suspicious link']},
+  {id:6,sender:'📧 hr@acme-company.com',subj:'Interview Scheduled for Tuesday 2PM',body:"Hi, thank you for applying! We'd like to schedule an interview for Tuesday at 2PM via Zoom. The meeting link will be sent 30 minutes before. Please confirm your attendance.",isScam:false,flags:[]},
+];
+
+function ScamDetectorGame({onBack}){
+  const {addPoints,completeGame,user}=useApp();
+  const [cur,setCur]=useState(0);
+  const [answers,setAnswers]=useState([]);
+  const [revealed,setRevealed]=useState(false);
+  const [done,setDone]=useState(false);
+
+  const msg=SCAM_MSGS[cur];
+  const isLast=cur===SCAM_MSGS.length-1;
+
+  function vote(isScam){
+    const correct=isScam===msg.isScam;
+    setAnswers(p=>[...p,{isScam,correct}]);
+    setRevealed(true);
+  }
+
+  function next(){
+    if(isLast){finish();}
+    else{setCur(c=>c+1);setRevealed(false);}
+  }
+
+  function finish(){
+    // count all answers including current
+    const all=[...answers];
+    const correctCount=all.filter(a=>a.correct).length;
+    const pts=Math.round((correctCount/SCAM_MSGS.length)*50);
+    setDone(true);
+    if(!user.completedGames?.includes('scam-detector')){addPoints(pts);completeGame('scam-detector');}
+  }
+
+  if(done){
+    const correctCount=answers.filter(a=>a.correct).length;
+    const pts=Math.round((correctCount/SCAM_MSGS.length)*50);
+    return(
+      <div className="card"><div className="quiz-result">
+        <div className="quiz-result-icon">{correctCount>=5?'🛡️':'🔍'}</div>
+        <h3>{correctCount>=5?'Scam Buster!':'Keep Practicing!'}</h3>
+        <p style={{color:'var(--muted)'}}>{correctCount} / {SCAM_MSGS.length} correct</p>
+        <div className="pts-earned">+{pts} pts</div>
+        <p style={{fontSize:'.83rem',color:'var(--muted)',maxWidth:320,textAlign:'center'}}>Always check sender domains, beware of urgency tactics, and never pay with gift cards!</p>
+        <button className="btn btn-gold" onClick={onBack}>← Back to Games</button>
+      </div></div>
+    );
+  }
+
+  const lastAns=answers[answers.length-1];
+  return(
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',marginBottom:14,fontSize:'.83rem'}}>
+        <span style={{color:'var(--muted)'}}>Message {cur+1} of {SCAM_MSGS.length}</span>
+        <span style={{color:'var(--gold)',fontWeight:600}}>{answers.filter(a=>a.correct).length} correct so far</span>
+      </div>
+      <div className="progress-bar" style={{marginBottom:16}}>
+        <div className="progress-fill" style={{width:`${(cur/SCAM_MSGS.length)*100}%`}}/>
+      </div>
+      <div className={`scam-msg${revealed?(msg.isScam?' scam':' safe'):''}`}>
+        <div className="scam-sender">{msg.sender}</div>
+        <div className="scam-subj">{msg.subj}</div>
+        <div style={{fontSize:'.86rem',lineHeight:1.7}}>{msg.body}</div>
+      </div>
+      {revealed&&(
+        <div style={{padding:'11px 14px',borderRadius:10,marginBottom:14,background:msg.isScam?'rgba(244,63,122,.1)':'rgba(34,197,94,.1)',border:`1px solid ${msg.isScam?'var(--pink)':'var(--green)'}`}}>
+          {msg.isScam
+            ? <><p style={{color:'var(--pink)',fontWeight:700,marginBottom:3}}>⚠️ This IS a scam!</p><p style={{fontSize:'.8rem'}}>Red flags: {msg.flags.join(' • ')}</p></>
+            : <p style={{color:'var(--green)',fontWeight:700}}>✅ This is legitimate</p>
+          }
+          <p style={{fontSize:'.78rem',color:'var(--muted)',marginTop:5}}>{lastAns?.correct?'🎯 You got it right!':'❌ Incorrect this time.'}</p>
+        </div>
+      )}
+      {!revealed?(
+        <div className="vote-btns">
+          <button className="btn btn-pink btn-lg" onClick={()=>vote(true)}>🚨 It's a Scam!</button>
+          <button className="btn btn-teal btn-lg" onClick={()=>vote(false)}>✅ Looks Legit</button>
+        </div>
+      ):(
+        <div style={{textAlign:'center'}}>
+          <button className="btn btn-gold" onClick={next}>{isLast?'See Final Results →':'Next Message →'}</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   SHOP
+───────────────────────────────────────── */
+function ShopPage(){
+  const {user,buyItem}=useApp();
+  const [tab,setTab]=useState('stickers');
+  const items=SHOP_ITEMS[tab]||[];
+  return(
+    <div>
+      <div className="shop-hd-bar">
+        <div className="page-header" style={{margin:0}}>
+          <h1 className="page-title">🛍️ Shop</h1>
+          <p className="page-subtitle">Spend your points on cool items</p>
+        </div>
+        <div className="pts-display">⭐ {user.points} pts</div>
+      </div>
+      <div className="shop-tabs">
+        {[['stickers','🏷️ Stickers'],['avatars','🎭 Avatars'],['badges','🏅 Badges']].map(([id,label])=>(
+          <button key={id} className={`shop-tab${tab===id?' active':''}`} onClick={()=>setTab(id)}>{label}</button>
+        ))}
+      </div>
+      <div className="shop-grid">
+        {items.map(item=>{
+          const owned=user.ownedItems?.includes(item.id);
+          const afford=user.points>=item.cost;
+          return(
+            <div key={item.id} className={`shop-item${owned?' owned':''}`}>
+              <div className="shop-item-icon">{item.icon}</div>
+              <div className="shop-item-name">{item.name}</div>
+              <div className="shop-item-desc">{item.desc}</div>
+              <div className="shop-item-price">{owned?'✅ Owned':`⭐ ${item.cost} pts`}</div>
+              {!owned&&<button className={`btn btn-sm${afford?' btn-gold':' btn-outline'} w-full`} onClick={()=>buyItem(item)} disabled={!afford}>{afford?'Buy Now':'Need more pts'}</button>}
+            </div>
+          );
+        })}
+      </div>
+      <div className="card" style={{marginTop:18,textAlign:'center'}}>
+        <p style={{fontSize:'.86rem',color:'var(--muted)'}}>💡 Earn more points by completing <strong style={{color:'var(--gold)'}}>lessons</strong> and playing <strong style={{color:'var(--teal)'}}>games</strong>!</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   LEADERBOARD
+───────────────────────────────────────── */
+function LeaderboardPage(){
+  const {leaderboard,user}=useApp();
+  const sorted=[...leaderboard].sort((a,b)=>b.points-a.points);
+  const top3=sorted.slice(0,3);const rest=sorted.slice(3);
+  return(
+    <div>
+      <div className="page-header"><h1 className="page-title">🏆 Leaderboard</h1><p className="page-subtitle">Top earners in the FinQuest community</p></div>
+      <div className="lb-podium">
+        {top3[1]&&<div className="podium-item podium-2"><div className="podium-avatar" style={{width:62,height:62}}>{top3[1].avatar}</div><div className="podium-name">{top3[1].name}</div><div className="podium-pts">⭐{top3[1].points}</div><div className="podium-stand">2</div></div>}
+        {top3[0]&&<div className="podium-item podium-1"><div style={{fontSize:'1.3rem',marginBottom:3}}>👑</div><div className="podium-avatar" style={{width:76,height:76}}>{top3[0].avatar}</div><div className="podium-name" style={{fontWeight:700}}>{top3[0].name}</div><div className="podium-pts">⭐{top3[0].points}</div><div className="podium-stand">1</div></div>}
+        {top3[2]&&<div className="podium-item podium-3"><div className="podium-avatar" style={{width:56,height:56}}>{top3[2].avatar}</div><div className="podium-name">{top3[2].name}</div><div className="podium-pts">⭐{top3[2].points}</div><div className="podium-stand">3</div></div>}
+      </div>
+      <div className="lb-list">
+        {sorted.map((u,i)=>{
+          const isMe=u.uid==='demo-1'||u.name===user?.name;
+          return(
+            <div key={u.uid} className={`lb-row${isMe?' me':''}`}>
+              <div className="lb-rank">{i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`}</div>
+              <div className="lb-avi">{u.avatar}</div>
+              <div className="lb-name">{u.name}{isMe&&<span className="badge badge-gold" style={{marginLeft:7,fontSize:'.62rem'}}>You</span>}</div>
+              <div className="lb-pts">⭐ {u.points}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="card" style={{marginTop:18,textAlign:'center'}}>
+        <p style={{fontSize:'.86rem',color:'var(--muted)'}}>🎯 You have <strong style={{color:'var(--gold)'}}>⭐ {user?.points||0} pts</strong>. Complete more to climb the leaderboard!</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   RENDER
+───────────────────────────────────────── */
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>
