@@ -122,7 +122,25 @@ p{color:var(--text-secondary)}
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+ <script type="text/babel">
+
+function downloadFinancePDF(title, content) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(18);
+  doc.text(title, 20, 20);
+
+  doc.setFontSize(12);
+
+  const lines = doc.splitTextToSize(content, 170);
+  doc.text(lines, 20, 40);
+
+  doc.save(title.replace(/\s+/g, "_") + ".pdf");
+}
+
+
 const { useState, useEffect, useContext, createContext, useRef } = React;
 
 // ── Mock Auth Context (no Firebase needed for demo) ──────────
@@ -673,6 +691,21 @@ const Lessons = () => {
                   {done && <span style={{color:'var(--accent-green)',fontSize:'.82rem',fontWeight:600}}>✅ Done</span>}
                 </div>
                 <h3 style={{fontSize:'1.05rem',marginBottom:'.4rem'}}>{lesson.title}</h3>
+				<button
+  className="btn btn-b"
+  style={{marginTop:'8px'}}
+  onClick={(e)=>{
+    e.stopPropagation();
+
+    const text = lesson.content
+      .map(c => c.heading + ": " + c.text)
+      .join("\n\n");
+
+    downloadFinancePDF(lesson.title, text);
+  }}
+>
+📄 Download Notes
+</button>
                 <div style={{display:'flex',gap:'.75rem',fontSize:'.78rem',color:'var(--text-muted)',marginTop:'.6rem'}}>
                   <span>⏱ {lesson.duration}</span><span>⭐ {lesson.points} pts</span><span>📄 {lesson.content.length} sections</span>
                 </div>
