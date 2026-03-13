@@ -1,8 +1,8 @@
 inserting in head tag
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+LINE M=NO 4 - <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
- const firebaseConfig = {
+ LINE NO 128 - const firebaseConfig = {
   apiKey: "AIzaSyD84XFjt4MawIZvR5-N9PBT1ihvtsMydA",
   authDomain: "finquest1.firebaseapp.com",
   projectId: "finquest1",
