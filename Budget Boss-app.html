@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZ84XFjt4MawIzVR5-N9PBT1ihVtsMydA",
+    authDomain: "finquest1.firebaseapp.com",
+    projectId: "finquest1",
+    storageBucket: "finquest1.firebasestorage.app",
+    messagingSenderId: "390666239301",
+    appId: "1:390666239301:web:1e190b2c3789f98f82522c",
+    measurementId: "G-DTCQLEHFM5"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>FinQuest – Gamified Financial Education</title>
