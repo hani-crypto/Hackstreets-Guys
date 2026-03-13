@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinQuest – Gamified Financial Education</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg-base:#080c14;--bg-card:#0f1827;--bg-card2:#121f33;--bg-surface:#162035;--accent-green:#00e5a0;--accent-gold:#ffd94a;--accent-blue:#3b9eff;--accent-purple:#a259ff;--accent-coral:#ff6b6b;--text-primary:#e8f0fe;--text-secondary:#7b8fab;--text-muted:#4a5568;--border:rgba(59,158,255,0.15);--border-bright:rgba(0,229,160,0.3);--glow-green:0 0 20px rgba(0,229,160,0.3);--glow-gold:0 0 20px rgba(255,217,74,0.3);--glow-blue:0 0 20px rgba(59,158,255,0.3);--radius:16px;--radius-sm:10px;--font-display:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg-base);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-base)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:700;line-height:1.2}
+h1{font-size:clamp(2rem,5vw,3.5rem)}h2{font-size:clamp(1.4rem,3vw,2rem)}h3{font-size:1.2rem}
+p{color:var(--text-secondary)}
+.gt{background:linear-gradient(135deg,var(--accent-green),var(--accent-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.gold-text{background:linear-gradient(135deg,var(--accent-gold),#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:var(--transition)}
+.card:hover{border-color:var(--border-bright)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:var(--transition);letter-spacing:.02em}
+.btn-p{background:linear-gradient(135deg,var(--accent-green),#00b87a);color:#000}
+.btn-p:hover{transform:translateY(-2px);box-shadow:var(--glow-green)}
+.btn-s{background:transparent;color:var(--accent-green);border:1px solid var(--accent-green)}
+.btn-s:hover{background:rgba(0,229,160,.1)}
+.btn-g{background:linear-gradient(135deg,var(--accent-gold),#ffaa00);color:#000}
+.btn-g:hover{transform:translateY(-2px);box-shadow:var(--glow-gold)}
+.btn-b{background:linear-gradient(135deg,var(--accent-blue),#0066cc);color:#fff}
+.btn-b:hover{transform:translateY(-2px)}
+.btn-r{background:linear-gradient(135deg,var(--accent-coral),#cc4444);color:#fff}
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .8rem;border-radius:100px;font-size:.78rem;font-weight:600;font-family:var(--font-display)}
+.bg{background:rgba(0,229,160,.15);color:var(--accent-green);border:1px solid rgba(0,229,160,.3)}
+.bb{background:rgba(59,158,255,.15);color:var(--accent-blue);border:1px solid rgba(59,158,255,.3)}
+.bgo{background:rgba(255,217,74,.15);color:var(--accent-gold);border:1px solid rgba(255,217,74,.3)}
+.bp{background:rgba(162,89,255,.15);color:var(--accent-purple);border:1px solid rgba(162,89,255,.3)}
+.bc{background:rgba(255,107,107,.15);color:var(--accent-coral);border:1px solid rgba(255,107,107,.3)}
+.input{width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:.95rem;transition:var(--transition);outline:none}
+.input:focus{border-color:var(--accent-green);box-shadow:0 0 0 3px rgba(0,229,160,.1)}
+.input::placeholder{color:var(--text-muted)}
+.label{display:block;font-size:.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:.4rem;letter-spacing:.05em;text-transform:uppercase}
+.err{color:var(--accent-coral);font-size:.85rem;margin-top:.5rem}
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 1rem;position:fixed;height:100vh;z-index:100;overflow-y:auto}
+.main{margin-left:240px;flex:1;padding:2rem;min-height:100vh}
+.nav-logo{font-family:var(--font-display);font-size:1.4rem;font-weight:800;margin-bottom:2rem;padding:.5rem}
+.nav-links{display:flex;flex-direction:column;gap:.3rem;flex:1}
+.nav-link{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:var(--radius-sm);color:var(--text-secondary);text-decoration:none;font-weight:500;transition:var(--transition);cursor:pointer;border:none;background:transparent;font-family:var(--font-body);font-size:.95rem;width:100%;text-align:left}
+.nav-link:hover{background:var(--bg-surface);color:var(--text-primary)}
+.nav-link.active{background:rgba(0,229,160,.1);color:var(--accent-green);border-left:3px solid var(--accent-green)}
+.nav-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:1rem}
+/* Landing */
+.landing{min-height:100vh;display:flex;flex-direction:column;background:var(--bg-base);position:relative;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;animation:float 8s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--accent-green);top:-200px;right:-100px}
+.o2{width:400px;height:400px;background:var(--accent-blue);bottom:-100px;left:-100px;animation-delay:-4s}
+.o3{width:300px;height:300px;background:var(--accent-purple);top:40%;left:30%;animation-delay:-2s}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+.lnav{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 3rem;position:relative;z-index:1}
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 2rem;position:relative;z-index:1}
+/* Auth */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--bg-base);position:relative;overflow:hidden}
+.auth-card{background:var(--bg-card);border:1px solid var(--border);border-radius:calc(var(--radius)*1.5);padding:2.5rem;width:100%;max-width:440px;position:relative;z-index:1}
+/* Progress */
+.prog-wrap{background:var(--bg-surface);border-radius:100px;height:8px;overflow:hidden;margin-top:.5rem}
+.prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent-green),var(--accent-blue));transition:width .5s ease}
+/* Game screens */
+.game-hud{display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1.5rem}
+.hud-v{font-family:var(--font-display);font-size:1.3rem;font-weight:800;color:var(--accent-green)}
+.hud-l{font-size:.72rem;color:var(--text-muted)}
+.choice{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;color:var(--text-primary);font-family:var(--font-body);font-size:.92rem;cursor:pointer;transition:var(--transition);text-align:left;display:flex;align-items:center;gap:.75rem;width:100%;margin-bottom:.6rem}
+.choice:hover{border-color:var(--accent-blue);background:rgba(59,158,255,.08)}
+.choice.correct{border-color:var(--accent-green)!important;background:rgba(0,229,160,.15)!important}
+.choice.wrong{border-color:var(--accent-coral)!important;background:rgba(255,107,107,.15)!important}
+.cletter{width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.feedback{background:var(--bg-card2);border-radius:var(--radius-sm);padding:1rem 1.25rem;margin-top:1rem;font-size:.9rem;line-height:1.6;border-left:3px solid var(--accent-green)}
+.feedback.wrong{border-left-color:var(--accent-coral)}
+/* Results */
+.result-screen{max-width:700px;margin:0 auto;text-align:center}
+.trophy{font-size:5rem;animation:bounceIn .6s ease;margin-bottom:1rem}
+@keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.score-big{font-family:var(--font-display);font-size:3.5rem;font-weight:800;margin-bottom:.25rem}
+.grade-badge{display:inline-block;padding:.4rem 1.5rem;border-radius:100px;font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:1.5rem}
+.analysis{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0;text-align:left}
+.a-item{background:var(--bg-surface);border-radius:var(--radius-sm);padding:1rem}
+.a-label{font-size:.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.a-val{font-family:var(--font-display);font-size:1.1rem;font-weight:700}
+.lesson-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(59,158,255,.15);border:1px solid rgba(59,158,255,.3);border-radius:8px;padding:.4rem .75rem;font-size:.82rem;color:var(--accent-blue);margin:.25rem}
+/* Shop */
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:1.25rem}
+.shop-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;transition:var(--transition);cursor:pointer;position:relative}
+.shop-item:hover{border-color:var(--accent-gold);box-shadow:var(--glow-gold);transform:translateY(-3px)}
+.shop-item.owned{border-color:var(--accent-green);background:rgba(0,229,160,.05)}
+/* Leaderboard */
+.leader-row{display:flex;align-items:center;gap:1rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.5rem;transition:var(--transition);margin-bottom:.6rem}
+.leader-self{border-color:var(--accent-green)!important;background:rgba(0,229,160,.05)}
+/* Toast */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--bg-card);border:1px solid var(--accent-green);border-radius:var(--radius-sm);padding:1rem 1.5rem;z-index:9999;animation:slideUp .3s ease;box-shadow:var(--glow-green);font-weight:600;max-width:320px}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:calc(var(--radius)*1.5);padding:2rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative}
+/* Animations */
+.fade{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;flex-wrap:wrap;padding:.75rem}
+  .main{margin-left:0;padding:1rem}
+  .app{flex-direction:column}
+  .nav-links{flex-direction:row;flex-wrap:wrap}
+  .nav-link span.label{display:none}
+  .nav-bottom{border-top:none;margin-left:auto}
+  .nav-logo{margin-bottom:0}
+  .analysis{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useContext, createContext, useRef } = React;
+
+// ── Local Storage Auth Context (Bypasses Backend) ──────────
+const AuthCtx = createContext();
+const useAuth = () => useContext(AuthCtx);
+
+const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const activeEmail = localStorage.getItem('finquest_active_email');
+    if (activeEmail) {
+      setCurrentUser({ email: activeEmail, uid: 'demo-user' });
+      const savedData = localStorage.getItem('finquest_' + activeEmail);
+      if (savedData) {
+        setUserProfile(JSON.parse(savedData));
+      }
+    }
+  }, []);
+
+  const defaultProfile = (name) => ({
+    displayName: name, avatar: '🦊', points: 0, level: 1,
+    badges: [], purchasedItems: [], completedGames: [], completedLessons: [], joinedAt: new Date().toISOString()
+  });
+
+  const saveToLocal = (email, data) => {
+    localStorage.setItem('finquest_' + email, JSON.stringify(data));
+  };
+
+  const signup = async (email, password, name) => {
+    const profile = defaultProfile(name);
+    setCurrentUser({ email, uid: 'demo-' + Date.now() });
+    setUserProfile(profile);
+    saveToLocal(email, profile); 
+    localStorage.setItem('finquest_active_email', email);
+    return Promise.resolve();
+  };
+
+  const login = async (email, password) => {
+    setCurrentUser({ email, uid: 'demo-user' });
+    localStorage.setItem('finquest_active_email', email);
+    const savedData = localStorage.getItem('finquest_' + email);
+    
+    if (savedData) {
+        setUserProfile(JSON.parse(savedData)); 
+    } else {
+        const newProf = defaultProfile('Player');
+        setUserProfile(newProf);
+        saveToLocal(email, newProf);
+    }
+    return Promise.resolve();
+  };
+
+  const logout = () => { 
+    setCurrentUser(null); 
+    setUserProfile(null); 
+    localStorage.removeItem('finquest_active_email');
+    return Promise.resolve(); 
+  };
+
+  const addPoints = async (pts) => {
+    setUserProfile(p => {
+      const newPoints = (p.points || 0) + pts;
+      const newLevel = Math.floor(newPoints / 500) + 1;
+      const updated = { ...p, points: newPoints, level: newLevel };
+      if (currentUser?.email) saveToLocal(currentUser.email, updated);
+      return updated;
+    });
+    return Promise.resolve();
+  };
+
+  const updateProfileData = async (data) => {
+    setUserProfile(p => {
+        const updated = { ...p, ...data };
+        if (currentUser?.email) saveToLocal(currentUser.email, updated);
+        return updated;
+    });
+    return Promise.resolve();
+  };
+
+  const markComplete = async (type, id) => {
+    const field = type === 'lesson' ? 'completedLessons' : 'completedGames';
+    setUserProfile(p => {
+      const cur = p[field] || [];
+      if (cur.includes(id)) return p;
+      const updated = { ...p, [field]: [...cur, id] };
+      if (currentUser?.email) saveToLocal(currentUser.email, updated);
+      return updated;
+    });
+    return Promise.resolve();
+  };
+
+  const purchaseItem = async (item) => {
+    if ((userProfile?.points || 0) < item.cost) return Promise.resolve(false);
+    setUserProfile(p => {
+      const updated = {
+        ...p,
+        points: p.points - item.cost,
+        purchasedItems: [...(p.purchasedItems || []), item.id]
+      };
+      if (currentUser?.email) saveToLocal(currentUser.email, updated);
+      return updated;
+    });
+    return Promise.resolve(true);
+  };
+
+  return (
+    <AuthCtx.Provider value={{ currentUser, userProfile, signup, login, logout, addPoints, updateProfileData, markComplete, purchaseItem }}>
+      {children}
+    </AuthCtx.Provider>
+  );
+};
+
+// ── Toast hook ─────────────────────────────────────────────
+const useToast = () => {
+  const [toast, setToast] = useState('');
+  const show = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+  const Toast = () => toast ? <div className="toast">{toast}</div> : null;
+  return [show, Toast];
+};
+
+// ═══════════════════════════════════════════════════════════
+// LANDING PAGE
+// ═══════════════════════════════════════════════════════════
+const LandingPage = ({ navigate }) => {
+  const features = [
+    ['🎮','Learn by Playing','Interactive games make finance fun and memorable.'],
+    ['📚','Expert Lessons','Bite-sized lessons on budgeting, investing & more.'],
+    ['🏆','Earn Rewards','Collect points and badges as you level up.'],
+    ['📊','Track Progress','See your financial IQ grow in real time.'],
+    ['🛒','Avatar Shop','Spend points on cool profile customizations.'],
+    ['🌍','Leaderboard','Compete with friends and top learners globally.'],
+  ];
+  return (
+    <div className="landing">
+      <div style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:0}}>
+        <div className="orb o1"/><div className="orb o2"/><div className="orb o3"/>
+      </div>
+      <nav className="lnav">
+        <div style={{fontFamily:'var(--font-display)',fontSize:'1.4rem',fontWeight:800}}>
+          <span className="gt">Fin</span>Quest 💰
+        </div>
+        <div style={{display:'flex',gap:'1rem'}}>
+          <button className="btn btn-s" onClick={()=>navigate('login')}>Login</button>
+          <button className="btn btn-p" onClick={()=>navigate('signup')}>Sign Up Free</button>
+        </div>
+      </nav>
+      <section className="hero">
+        <div style={{display:'inline-flex',alignItems:'center',gap:'.5rem',background:'rgba(0,229,160,.1)',border:'1px solid rgba(0,229,160,.3)',borderRadius:'100px',padding:'.4rem 1rem',fontSize:'.85rem',color:'var(--accent-green)',marginBottom:'1.5rem',fontWeight:600}}>
+          🚀 Free Financial Education Platform
+        </div>
+        <h1 style={{marginBottom:'1.5rem',maxWidth:'700px'}}>
+          Master Money.{' '}<span className="gt">Play. Learn. Win.</span>
+        </h1>
+        <p style={{fontSize:'1.05rem',maxWidth:'520px',marginBottom:'2.5rem',lineHeight:'1.8'}}>
+          FinQuest gamifies financial literacy — earn points, beat challenges, and build real-world money skills through interactive games and lessons.
+        </p>
+        <div style={{display:'flex',gap:'1rem',flexWrap:'wrap',justifyContent:'center',marginBottom:'2.5rem'}}>
+          <button className="btn btn-p" style={{fontSize:'1rem',padding:'1rem 2rem'}} onClick={()=>navigate('signup')}>🎮 Start Playing Free</button>
+          <button className="btn btn-s" style={{fontSize:'1rem',padding:'1rem 2rem'}} onClick={()=>navigate('login')}>Already have account?</button>
+        </div>
+        <div style={{display:'flex',gap:'3rem',flexWrap:'wrap',justifyContent:'center'}}>
+          {[['10K+','Players'],['50+','Lessons'],['4','Games'],['∞','Fun']].map(([v,l])=>(
+            <div key={l} style={{textAlign:'center'}}>
+              <div style={{fontFamily:'var(--font-display)',fontSize:'2rem',fontWeight:800}} className="gt">{v}</div>
+              <div style={{fontSize:'.85rem',color:'var(--text-secondary)'}}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:'1.25rem',padding:'0 3rem 4rem',position:'relative',zIndex:1,maxWidth:'1100px',margin:'0 auto',width:'100%'}}>
+        {features.map(([icon,title,desc])=>(
+          <div key={title} style={{background:'rgba(15,24,39,.8)',border:'1px solid var(--border)',borderRadius:'var(--radius)',padding:'1.5rem',textAlign:'center',backdropFilter:'blur(10px)',transition:'var(--transition)'}}>
+            <div style={{fontSize:'2.5rem',marginBottom:'1rem'}}>{icon}</div>
+            <h3 style={{fontSize:'1rem',marginBottom:'.4rem'}}>{title}</h3>
+            <p style={{fontSize:'.85rem'}}>{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// AUTH PAGES
+// ═══════════════════════════════════════════════════════════
+const Login = ({ navigate }) => {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handle = async (e) => {
+    e.preventDefault();
+    if (!email || !pw) { setErr('Please fill in all fields.'); return; }
+    setLoading(true);
+    await login(email, pw);
+    navigate('dashboard');
+  };
+
+  return (
+    <div className="auth-page">
+      <div className="orb o1" style={{opacity:.06,position:'fixed'}}/><div className="orb o2" style={{opacity:.06,position:'fixed'}}/>
+      <div className="auth-card fade">
+        <div style={{textAlign:'center',marginBottom:'2rem'}}>
+          <div style={{fontSize:'2.5rem',marginBottom:'.5rem'}}>💰</div>
+          <h2>Welcome Back!</h2>
+          <p style={{fontSize:'.9rem',marginTop:'.3rem'}}>Log in to continue your FinQuest journey</p>
+        </div>
+        <form onSubmit={handle} style={{display:'flex',flexDirection:'column',gap:'1.2rem'}}>
+          <div><label className="label">Email</label><input className="input" type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+          <div><label className="label">Password</label><input className="input" type="password" placeholder="Your password" value={pw} onChange={e=>setPw(e.target.value)}/></div>
+          {err && <div className="err">⚠️ {err}</div>}
+          <button className="btn btn-p" type="submit" disabled={loading} style={{width:'100%',justifyContent:'center',fontSize:'1rem'}}>
+            {loading ? '⏳ Logging in...' : '🚀 Log In'}
+          </button>
+        </form>
+        <div style={{background:'rgba(59,158,255,.1)',border:'1px solid rgba(59,158,255,.3)',borderRadius:'var(--radius-sm)',padding:'.75rem',marginTop:'1rem',fontSize:'.82rem',color:'var(--accent-blue)'}}>
+          💡 <strong>Demo Mode:</strong> Enter any email & password to explore the app!
+        </div>
+        <div style={{textAlign:'center',marginTop:'1.5rem',fontSize:'.9rem',color:'var(--text-secondary)'}}>
+          Don't have an account?{' '}
+          <button style={{background:'none',border:'none',color:'var(--accent-green)',cursor:'pointer',fontWeight:600,fontSize:'.9rem'}} onClick={()=>navigate('signup')}>Sign up free</button>
+        </div>
+        <div style={{textAlign:'center',marginTop:'.5rem'}}>
+          <button style={{background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:'.9rem'}} onClick={()=>navigate('landing')}>← Back to home</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Signup = ({ navigate }) => {
+  const { signup } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handle = async (e) => {
+    e.preventDefault();
+    if (!name||!email||!pw) { setErr('Please fill in all fields.'); return; }
+    if (pw !== confirm) { setErr('Passwords do not match.'); return; }
+    if (pw.length < 4) { setErr('Password must be at least 4 characters.'); return; }
+    setLoading(true);
+    await signup(email, pw, name);
+    navigate('dashboard');
+  };
+
+  return (
+    <div className="auth-page">
+      <div className="orb o1" style={{opacity:.06,position:'fixed'}}/><div className="orb o3" style={{opacity:.05,position:'fixed'}}/>
+      <div className="auth-card fade">
+        <div style={{textAlign:'center',marginBottom:'2rem'}}>
+          <div style={{fontSize:'2.5rem',marginBottom:'.5rem'}}>🎮</div>
+          <h2>Join FinQuest</h2>
+          <p style={{fontSize:'.9rem',marginTop:'.3rem'}}>Create your free account and start earning points</p>
+        </div>
+        <form onSubmit={handle} style={{display:'flex',flexDirection:'column',gap:'1.2rem'}}>
+          <div><label className="label">Display Name</label><input className="input" type="text" placeholder="FinancePro42" value={name} onChange={e=>setName(e.target.value)}/></div>
+          <div><label className="label">Email</label><input className="input" type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/></div>
+          <div><label className="label">Password</label><input className="input" type="password" placeholder="Min 4 characters" value={pw} onChange={e=>setPw(e.target.value)}/></div>
+          <div><label className="label">Confirm Password</label><input className="input" type="password" placeholder="Re-enter password" value={confirm} onChange={e=>setConfirm(e.target.value)}/></div>
+          {err && <div className="err">⚠️ {err}</div>}
+          <button className="btn btn-p" type="submit" disabled={loading} style={{width:'100%',justifyContent:'center',fontSize:'1rem'}}>
+            {loading ? '⏳ Creating...' : '🚀 Create Free Account'}
+          </button>
+        </form>
+        <div style={{textAlign:'center',marginTop:'1.5rem',fontSize:'.9rem',color:'var(--text-secondary)'}}>
+          Already have an account? <button style={{background:'none',border:'none',color:'var(--accent-green)',cursor:'pointer',fontWeight:600,fontSize:'.9rem'}} onClick={()=>navigate('login')}>Log in</button>
+        </div>
+        <div style={{textAlign:'center',marginTop:'.5rem'}}>
+          <button style={{background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:'.9rem'}} onClick={()=>navigate('landing')}>← Back to home</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR NAVBAR
+// ═══════════════════════════════════════════════════════════
+const NAV_ITEMS = [
+  {id:'dashboard',icon:'🏠',label:'Dashboard'},
+  {id:'lessons',icon:'📚',label:'Lessons'},
+  {id:'games',icon:'🎮',label:'Games'},
+  {id:'shop',icon:'🛒',label:'Shop'},
+  {id:'leaderboard',icon:'🏆',label:'Leaderboard'},
+  {id:'profile',icon:'👤',label:'Profile'},
+];
+
+const Navbar = ({ page, navigate }) => {
+  const { userProfile, logout } = useAuth();
+  return (
+    <aside className="sidebar">
+      <div className="nav-logo"><span className="gt">Fin</span>Quest 💰</div>
+      <nav className="nav-links">
+        {NAV_ITEMS.map(item => (
+          <button key={item.id} className={`nav-link ${page===item.id?'active':''}`} onClick={()=>navigate(item.id)}>
+            <span style={{fontSize:'1.2rem',width:'1.5rem',textAlign:'center'}}>{item.icon}</span>
+            <span className="label">{item.label}</span>
+          </button>
+        ))}
+      </nav>
+      <div className="nav-bottom">
+        <div style={{display:'flex',alignItems:'center',gap:'.75rem',padding:'.75rem',marginBottom:'.5rem'}}>
+          <span style={{fontSize:'2rem'}}>{userProfile?.avatar||'🦊'}</span>
+          <div>
+            <div style={{fontWeight:600,fontSize:'.9rem'}}>{userProfile?.displayName||'Player'}</div>
+            <div style={{fontSize:'.78rem',color:'var(--accent-gold)'}}>⭐ {(userProfile?.points||0).toLocaleString()} pts</div>
+          </div>
+        </div>
+        <button className="nav-link" onClick={logout} style={{color:'var(--accent-coral)'}}>
+          <span style={{fontSize:'1.2rem'}}>🚪</span><span className="label">Logout</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+const Dashboard = ({ navigate }) => {
+  const { userProfile } = useAuth();
+  const pts = userProfile?.points||0, level = userProfile?.level||1;
+  const xpNeeded = level*500, progress = Math.min((pts%xpNeeded)/xpNeeded*100,100);
+  const greet = new Date().getHours()<12?'Good morning':new Date().getHours()<17?'Good afternoon':'Good evening';
+
+  const stats = [
+    {icon:'⭐',label:'Total Points',value:pts.toLocaleString(),color:'var(--accent-gold)'},
+    {icon:'📈',label:'Current Level',value:`Lvl ${level}`,color:'var(--accent-blue)'},
+    {icon:'🎮',label:'Games Played',value:userProfile?.completedGames?.length||0,color:'var(--accent-purple)'},
+    {icon:'📚',label:'Lessons Done',value:userProfile?.completedLessons?.length||0,color:'var(--accent-green)'},
+  ];
+
+  return (
+    <div className="fade">
+      <div style={{marginBottom:'2rem'}}>
+        <h2>{greet}, <span className="gt">{userProfile?.displayName||'Player'}</span> {userProfile?.avatar||'🦊'}</h2>
+        <p>Continue your financial learning journey. You're doing great!</p>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'1.25rem',marginBottom:'1.5rem'}}>
+        {stats.map(s=>(
+          <div className="card" key={s.label} style={{display:'flex',alignItems:'center',gap:'1rem'}}>
+            <div style={{fontSize:'2.5rem',width:55,height:55,display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg-surface)',borderRadius:'var(--radius-sm)'}}>{s.icon}</div>
+            <div>
+              <div style={{fontFamily:'var(--font-display)',fontSize:'1.7rem',fontWeight:800,color:s.color}}>{s.value}</div>
+              <div style={{fontSize:'.82rem',color:'var(--text-secondary)'}}>{s.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="card" style={{marginBottom:'1.5rem'}}>
+        <div style={{display:'flex',justifyContent:'space-between',marginBottom:'.75rem'}}>
+          <span className="badge bb">Level {level}</span>
+          <span style={{fontSize:'.85rem',color:'var(--text-muted)'}}>{pts%xpNeeded} / {xpNeeded} XP</span>
+        </div>
+        <div className="prog-wrap"><div className="prog-fill" style={{width:`${progress}%`}}/></div>
+        <p style={{fontSize:'.8rem',marginTop:'.5rem'}}>🎯 Earn {xpNeeded-(pts%xpNeeded)} more points to reach Level {level+1}!</p>
+      </div>
+      <h3 style={{marginBottom:'1rem'}}>Quick Actions</h3>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:'1rem',marginBottom:'2rem'}}>
+        {[['🎮','Play a Game','games','var(--accent-purple)'],['📚','Take a Lesson','lessons','var(--accent-blue)'],['🛒','Visit Shop','shop','var(--accent-gold)'],['🏆','Leaderboard','leaderboard','var(--accent-green)']].map(([ic,lb,pg,cl])=>(
+          <button key={pg} onClick={()=>navigate(pg)} style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:'var(--radius)',padding:'1.5rem',cursor:'pointer',transition:'var(--transition)',textAlign:'center',color:'var(--text-primary)',fontFamily:'var(--font-body)'}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=cl;e.currentTarget.style.transform='translateY(-3px)'}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor='var(--border)';e.currentTarget.style.transform=''}}>
+            <div style={{fontSize:'2.5rem',marginBottom:'.5rem'}}>{ic}</div>
+            <div style={{fontWeight:600,fontSize:'.9rem'}}>{lb}</div>
+          </button>
+        ))}
+      </div>
+      <div className="card" style={{background:'linear-gradient(135deg,rgba(0,229,160,.08),rgba(59,158,255,.08))'}}>
+        <h3 style={{marginBottom:'.75rem'}}>💡 Finance Tip of the Day</h3>
+        <p style={{fontSize:'.95rem',lineHeight:'1.7'}}>
+          <strong style={{color:'var(--accent-green)'}}>The 50/30/20 Rule:</strong>{' '}
+          Allocate 50% of your income to needs (rent, food, utilities), 30% to wants (entertainment, dining), and 20% to savings and debt repayment. This simple framework builds wealth over time.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════════════════════
+const AVATARS = ['🦊','🐼','🦁','🐯','🐺','🦅','🐉','🦄','🐸','🐙','🦋','🌟','🔥','💎','🎯','🚀','🌈','⚡','🏆','💰'];
+
+const Profile = () => {
+  const { userProfile, updateProfileData } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [newName, setNewName] = useState(userProfile?.displayName||'');
+  const [newAvatar, setNewAvatar] = useState(userProfile?.avatar||'🦊');
+  const [saved, setSaved] = useState(false);
+
+  const save = async () => {
+    await updateProfileData({ displayName: newName.trim(), avatar: newAvatar });
+    setEditing(false); setSaved(true); setTimeout(()=>setSaved(false),2000);
+  };
+
+  const earnedBadges = [
+    ...(userProfile?.points>=100?[{icon:'⭐',name:'First Steps',desc:'Earned 100 points'}]:[]),
+    ...(userProfile?.points>=300?[{icon:'🔥',name:'On Fire!',desc:'Earned 300 points'}]:[]),
+    ...(userProfile?.completedGames?.length>=1?[{icon:'🎮',name:'Gamer',desc:'Completed a game'}]:[]),
+    ...(userProfile?.completedLessons?.length>=1?[{icon:'📚',name:'Scholar',desc:'Completed a lesson'}]:[]),
+  ];
+
+  return (
+    <div className="fade">
+      <div style={{marginBottom:'2rem'}}><h2>👤 My Profile</h2><p>Customize your avatar and track your progress</p></div>
+      <div className="card" style={{display:'flex',alignItems:'center',gap:'2rem',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+        <div style={{position:'relative',fontSize:'5rem'}}>
+          {userProfile?.avatar||'🦊'}
+          <span style={{position:'absolute',bottom:0,right:-8,background:'var(--accent-gold)',color:'#000',borderRadius:'100px',padding:'.1rem .4rem',fontSize:'.7rem',fontWeight:800}}>Lvl {userProfile?.level||1}</span>
+        </div>
+        <div style={{flex:1}}>
+          {editing ? (
+            <div style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+              <div><label className="label">Display Name</label><input className="input" value={newName} onChange={e=>setNewName(e.target.value)} style={{maxWidth:300}}/></div>
+              <div style={{display:'flex',gap:'.75rem'}}>
+                <button className="btn btn-p" onClick={save}>✅ Save</button>
+                <button className="btn btn-s" onClick={()=>setEditing(false)}>Cancel</button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h2 style={{marginBottom:'.25rem'}}>{userProfile?.displayName||'Player'}</h2>
+              <p style={{fontSize:'.88rem',marginBottom:'1rem'}}>Member since {new Date(userProfile?.joinedAt||Date.now()).toLocaleDateString()}</p>
+              <button className="btn btn-s" onClick={()=>setEditing(true)}>✏️ Edit Profile</button>
+              {saved && <span style={{marginLeft:'1rem',color:'var(--accent-green)',fontSize:'.9rem'}}>✓ Saved!</span>}
+            </div>
+          )}
+        </div>
+      </div>
+      {editing && (
+        <div className="card" style={{marginBottom:'1.5rem'}}>
+          <h3 style={{marginBottom:'.75rem'}}>Choose Avatar</h3>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(60px,1fr))',gap:'.6rem'}}>
+            {AVATARS.map(av=>(
+              <div key={av} onClick={()=>setNewAvatar(av)} style={{fontSize:'2rem',padding:'.5rem',borderRadius:'var(--radius-sm)',border:`2px solid ${newAvatar===av?'var(--accent-green)':'transparent'}`,cursor:'pointer',textAlign:'center',transition:'var(--transition)',background:newAvatar===av?'rgba(0,229,160,.1)':'var(--bg-surface)'}}>
+                {av}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="card" style={{marginBottom:'1.5rem'}}>
+        <h3 style={{marginBottom:'1rem'}}>📊 Your Stats</h3>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:'1rem'}}>
+          {[[(userProfile?.points||0).toLocaleString(),'Total Points'],
+            [`Level ${userProfile?.level||1}`,'Current Level'],
+            [userProfile?.completedGames?.length||0,'Games Played'],
+            [userProfile?.completedLessons?.length||0,'Lessons Done'],
+            [userProfile?.purchasedItems?.length||0,'Items Owned'],
+            [earnedBadges.length,'Badges Earned'],
+          ].map(([v,l])=>(
+            <div key={l} style={{background:'var(--bg-surface)',borderRadius:'var(--radius-sm)',padding:'1rem',textAlign:'center'}}>
+              <div style={{fontFamily:'var(--font-display)',fontSize:'1.5rem',fontWeight:800,color:'var(--accent-green)'}}>{v}</div>
+              <div style={{fontSize:'.78rem',color:'var(--text-secondary)',marginTop:'.2rem'}}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card">
+        <h3 style={{marginBottom:'1rem'}}>🏆 Badges & Achievements</h3>
+        {earnedBadges.length===0 ? (
+          <p style={{textAlign:'center',padding:'2rem 0'}}>🎯 Complete games and lessons to earn your first badge!</p>
+        ) : (
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))',gap:'1rem'}}>
+            {earnedBadges.map(b=>(
+              <div key={b.name} style={{background:'var(--bg-surface)',borderRadius:'var(--radius-sm)',padding:'1rem',textAlign:'center'}}>
+                <div style={{fontSize:'2.5rem',marginBottom:'.4rem'}}>{b.icon}</div>
+                <div style={{fontWeight:700,fontSize:'.9rem'}}>{b.name}</div>
+                <div style={{fontSize:'.75rem',color:'var(--text-muted)'}}>{b.desc}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// LESSONS
+// ═══════════════════════════════════════════════════════════
+const LESSONS = [
+  {id:'budgeting-basics',title:'Budgeting Basics',icon:'💰',color:'#00e5a0',bg:'linear-gradient(135deg,#00e5a0,#00b87a)',category:'Budgeting',duration:'8 min',points:50,content:[
+    {heading:'What is a Budget?',text:'A budget is a financial plan that tracks income and expenses. It shows exactly where your money goes each month.'},
+    {heading:'The 50/30/20 Rule',text:'50% for Needs (rent, food), 30% for Wants (entertainment), 20% for Savings & Debt repayment. Simple and effective.'},
+    {heading:'Fixed vs Variable Expenses',text:'Fixed expenses stay the same monthly (rent). Variable expenses fluctuate (groceries, entertainment). Track both!'},
+    {heading:'Why Budget?',text:'Budgeting prevents overspending, reduces financial stress, and helps you reach savings goals faster.'},
+  ]},
+  {id:'investing-101',title:'Investing 101',icon:'📈',color:'#a259ff',bg:'linear-gradient(135deg,#a259ff,#7700cc)',category:'Investing',duration:'15 min',points:100,content:[
+    {heading:'What is Investing?',text:'Investing puts money into assets expecting growth over time. Unlike saving, it carries risk but offers much higher potential returns.'},
+    {heading:'Stocks vs Bonds',text:'Stocks = ownership in a company (higher risk, higher reward). Bonds = loans to companies/governments (lower risk, steady income).'},
+    {heading:'Diversification',text:'Spread investments across sectors and asset classes. If one falls, others may rise — reducing overall portfolio risk.'},
+    {heading:'The Power of Compound Returns',text:'Returns earned on your returns. ₹10,000 at 10% for 30 years = ₹1,74,494 — 17x your money!'},
+  ]},
+  {id:'credit-debt',title:'Credit & Debt Management',icon:'💳',color:'#ff6b6b',bg:'linear-gradient(135deg,#ff6b6b,#cc3333)',category:'Debt',duration:'12 min',points:80,content:[
+    {heading:'Credit Scores',text:'Your credit score (300–900) reflects creditworthiness. Higher scores get better loan rates. Pay on time, keep utilization low.'},
+    {heading:'Good Debt vs Bad Debt',text:'Good debt builds assets (education, home). Bad debt funds consumption at high rates (credit cards at 36% are the worst).'},
+    {heading:'Debt Avalanche Method',text:'Pay minimum on all debts, extra money goes to highest-interest debt first. Saves the most money in interest charges.'},
+    {heading:'Credit Card Strategy',text:'Pay the full balance every month — zero interest. Use cards for rewards and fraud protection, never spend what you can\'t pay.'},
+  ]},
+  {id:'savings-power',title:'The Power of Saving',icon:'🏦',color:'#3b9eff',bg:'linear-gradient(135deg,#3b9eff,#0066cc)',category:'Savings',duration:'10 min',points:60,content:[
+    {heading:'Emergency Fund',text:'Save 3–6 months of living expenses in an accessible account. This is your financial safety net against unexpected crises.'},
+    {heading:'Compound Interest Magic',text:'₹10,000 at 8% for 20 years = ₹46,610 — without adding another rupee. Start saving early; time is your greatest asset.'},
+    {heading:'Automate Your Savings',text:'Set up automatic transfers on payday before spending. "Pay yourself first" removes temptation and builds habits.'},
+    {heading:'High-Yield Accounts',text:'Regular savings: 3%. High-yield savings/FDs: 6–8%. Even 2% difference compounds dramatically over decades.'},
+  ]},
+  {id:'taxes-basics',title:'Taxes Made Simple',icon:'🧾',color:'#ffd94a',bg:'linear-gradient(135deg,#ffd94a,#cc9900)',category:'Taxes',duration:'12 min',points:75,content:[
+    {heading:'Income Tax Slabs (India)',text:'New regime: 0% up to ₹3L, 5% (₹3-7L), 10% (₹7-10L), 15% (₹10-12L), 20% (₹12-15L), 30% above ₹15L.'},
+    {heading:'Tax Deductions',text:'Section 80C: up to ₹1.5L for PPF, ELSS, LIC, EPF investments. 80D covers health insurance premiums.'},
+    {heading:'Filing Returns',text:'File ITR by July 31 each year at incometax.gov.in. Even if TDS was deducted, filing is required to claim refunds.'},
+    {heading:'GST Basics',text:'Goods & Services Tax on consumption. Rates: 0%, 5%, 12%, 18%, 28%. Critical for business owners to understand pricing.'},
+  ]},
+  {id:'financial-goals',title:'Setting Financial Goals',icon:'🎯',color:'#00e5a0',bg:'linear-gradient(135deg,#00e5a0,#3b9eff)',category:'Planning',duration:'8 min',points:50,content:[
+    {heading:'Why Set Goals?',text:'Goals give money direction. Without goals, spending is impulsive. With goals, every decision is a step toward something meaningful.'},
+    {heading:'SMART Goals',text:'Specific, Measurable, Achievable, Relevant, Time-bound. "Save ₹50,000 for a trip in 12 months" beats "save more money."'},
+    {heading:'Short vs Long-term Goals',text:'Short: emergency fund, vacation (0–2 yrs). Medium: car, education (2–5 yrs). Long: house, retirement (5+ yrs).'},
+    {heading:'Calculate Your Number',text:'Work backwards. Want ₹5L in 3 years? That\'s ₹13,900/month in savings. Knowing the number makes goals actionable.'},
+  ]},
+];
+
+const LessonModal = ({ lesson, onClose, onComplete, done }) => {
+  const [step, setStep] = useState(0);
+  const total = lesson.content.length;
+  const cur = lesson.content[step];
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal fade" onClick={e=>e.stopPropagation()}>
+        <div style={{background:lesson.bg,borderRadius:'var(--radius)',height:110,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'3rem',marginBottom:'1.5rem'}}>{lesson.icon}</div>
+        <div style={{display:'flex',gap:'.3rem',marginBottom:'1.5rem'}}>
+          {lesson.content.map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<=step?lesson.color:'var(--bg-surface)',transition:'background .3s'}}/>)}
+        </div>
+        <span className="badge bb" style={{marginBottom:'.75rem',display:'inline-block'}}>{step+1}/{total}</span>
+        <h3 style={{marginBottom:'.75rem'}}>{cur.heading}</h3>
+        <p style={{lineHeight:'1.8',fontSize:'.95rem',color:'var(--text-primary)'}}>{cur.text}</p>
+        <div style={{display:'flex',gap:'.75rem',marginTop:'2rem'}}>
+          {step>0 && <button className="btn btn-s" onClick={()=>setStep(s=>s-1)}>← Back</button>}
+          <div style={{flex:1}}/>
+          {step<total-1 ? (
+            <button className="btn btn-p" onClick={()=>setStep(s=>s+1)}>Next →</button>
+          ) : (
+            <button className="btn btn-g" onClick={()=>{onComplete(lesson);onClose()}} disabled={done}>
+              {done ? '✅ Completed' : `🏆 Complete (+${lesson.points} pts)`}
+            </button>
+          )}
+        </div>
+        <button onClick={onClose} style={{position:'absolute',top:'1rem',right:'1rem',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:'1.2rem'}}>✕</button>
+      </div>
+    </div>
+  );
+};
+
+const Lessons = () => {
+  const { userProfile, markComplete, addPoints } = useAuth();
+  const [selected, setSelected] = useState(null);
+  const [showToast, Toast] = useToast();
+  const completed = userProfile?.completedLessons||[];
+
+  const handleComplete = async (lesson) => {
+    if (completed.includes(lesson.id)) return;
+    await markComplete('lesson', lesson.id);
+    await addPoints(lesson.points);
+    showToast(`🎉 +${lesson.points} points! "${lesson.title}" completed!`);
+  };
+
+  return (
+    <div className="fade">
+      <div style={{marginBottom:'2rem'}}><h2>📚 Lessons</h2><p>Learn financial concepts. Complete each one to earn points!</p></div>
+      <div style={{display:'flex',gap:'.5rem',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+        <span className="badge bg">✅ {completed.length} completed</span>
+        <span className="badge bb">📖 {LESSONS.length-completed.length} remaining</span>
+        <span className="badge bgo">⭐ {LESSONS.filter(l=>completed.includes(l.id)).reduce((s,l)=>s+l.points,0)} pts earned</span>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'1.25rem'}}>
+        {LESSONS.map(lesson=>{
+          const done = completed.includes(lesson.id);
+          return (
+            <div key={lesson.id} className="card" style={{cursor:'pointer',overflow:'hidden',padding:0,border:done?'1px solid var(--accent-green)':'1px solid var(--border)'}} onClick={()=>setSelected(lesson)}>
+              <div style={{background:lesson.bg,height:110,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'3rem'}}>{lesson.icon}</div>
+              <div style={{padding:'1.2rem'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'.4rem'}}>
+                  <span className="badge bb">{lesson.category}</span>
+                  {done && <span style={{color:'var(--accent-green)',fontSize:'.82rem',fontWeight:600}}>✅ Done</span>}
+                </div>
+                <h3 style={{fontSize:'1.05rem',marginBottom:'.4rem'}}>{lesson.title}</h3>
+                <div style={{display:'flex',gap:'.75rem',fontSize:'.78rem',color:'var(--text-muted)',marginTop:'.6rem'}}>
+                  <span>⏱ {lesson.duration}</span><span>⭐ {lesson.points} pts</span><span>📄 {lesson.content.length} sections</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {selected && <LessonModal lesson={selected} onClose={()=>setSelected(null)} onComplete={handleComplete} done={completed.includes(selected.id)}/>}
+      <Toast/>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// BUDGET BUILDER GAME
+// ═══════════════════════════════════════════════════════════
+const BudgetBuilder = ({ onComplete, onBack }) => {
+  const SCENARIO = {
+    income: 45000, emoji: '💼',
+    categories: [
+      {key:'rent',label:'🏠 Rent',ideal:[10000,18000],tip:'Keep rent below 35%'},
+      {key:'food',label:'🍱 Food',ideal:[5000,9000],tip:'Cooking at home saves money'},
+      {key:'transport',label:'🚗 Transport',ideal:[3000,6000],tip:'Consider public transport'},
+      {key:'utilities',label:'💡 Utilities',ideal:[1500,3000],tip:'Electricity, internet, phone'},
+      {key:'entertainment',label:'🎉 Lifestyle',ideal:[3000,7000],tip:'Balance enjoyment with savings'},
+      {key:'savings',label:'💰 Savings',ideal:[9000,15000],tip:'Aim to save 20-30% of income'},
+    ]
+  };
+  const [values, setValues] = useState({});
+  const [result, setResult] = useState(null);
+
+  const total = SCENARIO.categories.reduce((s,c)=>s+(Number(values[c.key])||0),0);
+  const remaining = SCENARIO.income - total;
+
+  const evaluate = () => {
+    let score = 0, fb = [];
+    SCENARIO.categories.forEach(cat=>{
+      const v = Number(values[cat.key])||0, [mn,mx] = cat.ideal;
+      if(v>=mn&&v<=mx){score+=20;fb.push({status:'good',msg:`✅ Great: ${cat.label.split(' ')[1]} allocation is ideal!`})}
+      else if(v<mn){score+=5;fb.push({status:'low',msg:`⚠️ ${cat.label.split(' ')[1]} too low. Ideal: ₹${mn.toLocaleString()}–${mx.toLocaleString()}`})}
+      else{fb.push({status:'high',msg:`❌ Overspending on ${cat.label.split(' ')[1]}. Ideal: ₹${mn.toLocaleString()}–${mx.toLocaleString()}`})}
+    });
+    setResult({score:Math.min(100,score),fb,remaining});
+  };
+
+  if(result){
+    const grade = result.score>=80?'A':result.score>=60?'B':result.score>=40?'C':'D';
+    const gc = {A:'var(--accent-green)',B:'var(--accent-blue)',C:'var(--accent-gold)',D:'var(--accent-coral)'}[grade];
+    return (
+      <div className="result-screen fade">
+        <div className="trophy">{grade==='A'?'🏆':grade==='B'?'🥈':grade==='C'?'🎯':'📊'}</div>
+        <h2>Budget Evaluation</h2>
+        <div className="score-big" style={{color:gc}}>{result.score}/100</div>
+        <div className="grade-badge" style={{background:gc+'22',color:gc,border:`1px solid ${gc}`}}>Grade {grade}</div>
+        <div style={{textAlign:'left',marginBottom:'1.5rem'}}>
+          {result.fb.map((f,i)=>(
+            <div key={i} style={{padding:'.7rem 1rem',background:'var(--bg-surface)',borderRadius:'var(--radius-sm)',marginBottom:'.5rem',fontSize:'.88rem',borderLeft:`3px solid ${f.status==='good'?'var(--accent-green)':f.status==='low'?'var(--accent-gold)':'var(--accent-coral)'}`}}>{f.msg}</div>
+          ))}
+          <div style={{padding:'.7rem 1rem',background:'var(--bg-surface)',borderRadius:'var(--radius-sm)',fontSize:'.88rem',borderLeft:`3px solid ${remaining>=0?'var(--accent-green)':'var(--accent-coral)'}`}}>
+            {remaining>=0?`✅ ₹${remaining.toLocaleString()} unallocated — great financial buffer!`:`❌ Overspent by ₹${Math.abs(remaining).toLocaleString()}!`}
+          </div>
+        </div>
+        <div className="card" style={{textAlign:'left',marginBottom:'1.5rem'}}>
+          <h3 style={{marginBottom:'.75rem'}}>📚 Related Financial Topics</h3>
+          {['50/30/20 Budgeting Rule','Fixed vs Variable Expenses','Emergency Fund Planning','Pay Yourself First'].map(t=>(
+            <span key={t} className="lesson-tag">{t}</span>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:'1rem',justifyContent:'center',flexWrap:'wrap'}}>
+          <button className="btn btn-g" onClick={()=>onComplete(Math.round(result.score*1.5))}>🏆 Claim {Math.round(result.score*1.5)} Points</button>
+          <button className="btn btn-s" onClick={()=>{setValues({});setResult(null)}}>Play Again</button>
+          <button className="btn btn-s" onClick={onBack}>Back</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+      <button className="btn btn-s" onClick={onBack} style={{marginBottom:'1rem'}}>← Back to Games</button>
+      <div style={{textAlign:'center',background:'linear-gradient(135deg,rgba(0,229,160,.1),rgba(59,158,255,.1))',border:'1px solid var(--border-bright)',borderRadius:'var(--radius)',padding:'1.5rem 2rem',marginBottom:'1.5rem'}}>
+        <div style={{fontSize:'.85rem',color:'var(--text-secondary)'}}>Monthly Income</div>
+        <div style={{fontFamily:'var(--font-display)',fontSize:'3rem',fontWeight:800}} className="gt">₹{SCENARIO.income.toLocaleString()}</div>
+        <div style={{fontSize:'.85rem',marginTop:'.5rem'}}>{SCENARIO.emoji} First Job Budget Challenge</div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem',marginBottom:'1.5rem'}}>
+        {SCENARIO.categories.map(cat=>(
+          <div key={cat.key} style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'var(--bg-surface)',borderRadius:'var(--radius-sm)',padding:'.75rem 1rem',gap:'1rem'}}>
+            <div>
+              <div style={{fontSize:'.88rem',fontWeight:500}}>{cat.label}</div>
+              <div style={{fontSize:'.7rem',color:'var(--text-muted)'}}>Ideal: ₹{cat.ideal[0].toLocaleString()}–{cat.ideal[1].toLocaleString()}</div>
+            </div>
+            <input type="number" min="0" max="45000" placeholder="₹0" value={values[cat.key]||''} onChange={e=>setValues(p=>({...p,[cat.key]:e.target.value}))}
+              style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:8,padding:'.4rem .6rem',color:'var(--text-primary)',fontFamily:'var(--font-body)',width:95,textAlign:'right',fontSize:'.9rem',outline:'none'}}/>
+          </div>
+        ))}
+      </div>
+      <div style={{textAlign:'center',fontFamily:'var(--font-display)',fontSize:'1.5rem',fontWeight:800,padding:'1rem',borderRadius:'var(--radius-sm)',color:remaining>=0?'var(--accent-green)':'var(--accent-coral)'}}>
+        Remaining: ₹{remaining.toLocaleString()}
+      </div>
+      <div style={{display:'flex',justifyContent:'center',marginTop:'1.5rem'}}>
+        <button className="btn btn-p" onClick={evaluate} disabled={Object.keys(values).length<SCENARIO.categories.length} style={{fontSize:'1rem',padding:'.875rem 2rem'}}>
+          📊 Evaluate My Budget
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// FINANCE QUIZ
+// ═══════════════════════════════════════════════════════════
+const QUESTIONS = [
+  {q:'You invest ₹10,000 at 10% compound interest yearly. How much after 3 years?',opts:['₹13,000','₹13,310','₹13,100','₹12,100'],correct:1,exp:'₹10,000 × (1.10)³ = ₹13,310. Compound interest earns returns on your growing balance, not just the original amount.',cat:'Compound Interest'},
+  {q:'What does the 50/30/20 rule recommend for savings?',opts:['50% of income','30% of income','20% of income','10% of income'],correct:2,exp:'50% for needs, 30% for wants, 20% for savings & debt repayment. A simple and effective budgeting framework.',cat:'Budgeting'},
+  {q:'How many months of expenses should an emergency fund ideally cover?',opts:['1 month','3–6 months','12 months','No fund needed'],correct:1,exp:'3–6 months covers job loss, medical emergencies, or major repairs without going into debt.',cat:'Savings'},
+  {q:'Which of these is "bad debt"?',opts:['Home mortgage at 8.5%','Education loan for degree','Credit card at 36% interest','Business loan for profitable shop'],correct:2,exp:'Bad debt funds consumption at high rates. Credit cards at 36% compound fast — the most expensive common debt.',cat:'Debt'},
+  {q:'What is "diversification" in investing?',opts:['Put all money in the best stock','Spread investments to reduce risk','Keep all savings in FD','Invest only in government bonds'],correct:1,exp:'Diversification spreads risk. If one asset falls, others may rise — reducing overall portfolio volatility.',cat:'Investing'},
+  {q:'What does P/E ratio tell you about a stock?',opts:['Company\'s total profit','Years of earnings you\'re paying','Stock growth in past year','Market capitalization'],correct:1,exp:'P/E = Share Price ÷ Earnings Per Share. P/E of 20 means you pay 20x annual earnings. Compare to industry peers.',cat:'Stock Analysis'},
+  {q:'What is "rupee-cost averaging" in SIP investing?',opts:['Investing only when markets are low','Fixed monthly investments regardless of market level','Putting a lump sum in one go','Investing in multiple currencies'],correct:1,exp:'SIP means fixed monthly investments. You buy more units when prices are low, fewer when high — averaging out your purchase cost.',cat:'Mutual Funds'},
+  {q:'Under India\'s new tax regime, what is tax on income ₹7L–₹10L?',opts:['5%','10%','15%','20%'],correct:1,exp:'New regime: 0% up to ₹3L, 5% (₹3–7L), 10% (₹7–10L), 15% (₹10–12L), 20% (₹12–15L), 30% above ₹15L.',cat:'Taxation'},
+  {q:'What is the "Rule of 72"?',opts:['Save 72% of windfalls','72 ÷ interest rate = years to double money','72 months of savings to retire','Historical stock market return'],correct:1,exp:'Rule of 72: Years to double = 72 ÷ rate. At 8% returns, money doubles in 9 years. Quick mental math for investment decisions.',cat:'Investing'},
+  {q:'Credit utilization ratio should ideally be kept below:',opts:['70%','50%','30%','10%'],correct:2,exp:'Credit utilization = balance ÷ credit limit × 100. Below 30% signals financial discipline and helps maintain a high credit score.',cat:'Credit Score'},
+];
+
+const FinanceQuiz = ({ onComplete, onBack }) => {
+  const [phase, setPhase] = useState('intro');
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const [score, setScore] = useState(0);
+  const [time, setTime] = useState(30);
+  const timerRef = useRef(null);
+
+  useEffect(()=>{
+    if(phase!=='quiz'||answered) return;
+    timerRef.current = setInterval(()=>{
+      setTime(t=>{
+        if(t<=1){clearInterval(timerRef.current);handleAnswer(-1);return 0;}
+        return t-1;
+      });
+    },1000);
+    return ()=>clearInterval(timerRef.current);
+  },[phase,answered,current]);
+
+  const handleAnswer = (i) => {
+    if(answered) return;
+    clearInterval(timerRef.current);
+    setSelected(i); setAnswered(true);
+    if(i===QUESTIONS[current].correct) setScore(s=>s+10);
+  };
+
+  const next = () => {
+    if(current<QUESTIONS.length-1){
+      setCurrent(c=>c+1); setSelected(null); setAnswered(false); setTime(30);
+    } else { setPhase('result'); }
+  };
+
+  if(phase==='intro') return (
+    <div style={{maxWidth:700,margin:'0 auto',textAlign:'center'}} className="fade">
+      <button className="btn btn-s" onClick={onBack} style={{marginBottom:'1.5rem',float:'left'}}>← Back</button>
+      <div style={{clear:'both'}}/>
+      <div style={{fontSize:'5rem',marginBottom:'1rem'}}>🧠</div>
+      <h2 style={{marginBottom:'.5rem'}}>Financial Literacy Quiz</h2>
+      <p style={{marginBottom:'2rem',lineHeight:'1.8'}}>10 questions on budgeting, investing, taxes & more.<br/>⏱️ <strong>30 seconds per question!</strong></p>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'1rem',marginBottom:'2rem'}}>
+        {[['10','Questions'],['30s','Per Q'],['100','Max Pts']].map(([v,l])=>(
+          <div key={l} style={{background:'var(--bg-card)',border:'1px solid var(--border)',borderRadius:'var(--radius-sm)',padding:'1rem',textAlign:'center'}}>
+            <div style={{fontFamily:'var(--font-display)',fontSize:'2rem',fontWeight:800,color:'var(--accent-green)'}}>{v}</div>
+            <div style={{fontSize:'.8rem',color:'var(--text-muted)'}}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-p" onClick={()=>setPhase('quiz')} style={{fontSize:'1rem',padding:'1rem 2.5rem'}}>🚀 Start Quiz</button>
+    </div>
+  );
+
+  if(phase==='result'){
+    const g = score>=80?'A':score>=60?'B':score>=40?'C':'D';
+    const gc = {A:'var(--accent-green)',B:'var(--accent-blue)',C:'var(--accent-gold)',D:'var(--accent-coral)'}[g];
+    return (
+      <div className="result-screen fade">
+        <div className="trophy">{g==='A'?'🏆':g==='B'?'🥈':g==='C'?'🎯':'📚'}</div>
+        <h2>Quiz Complete!</h2>
+        <div className="score-big" style={{color:gc}}>{score}/100</div>
+        <div className="grade-badge" style={{background:gc+'22',color:gc,border:`1px solid ${gc}`}}>
+          Grade {g} — {g==='A'?'Finance Expert!':g==='B'?'Smart Learner':g==='C'?'Developing Well':'Keep Practicing!'}
+        </div>
+        <div className="analysis">
+          {[['Correct',`${score/10}/10`,'var(--accent-green)'],['Wrong',`${(100-score)/10}/10`,'var(--accent-coral)'],['Accuracy',`${score}%`,gc],['Points',`⭐ ${score*2}`,'var(--accent-gold)']].map(([l,v,c])=>(
+            <div key={l} className="a-item"><div className="a-label">{l}</div><div className="a-val" style={{color:c}}>{v}</div></div>
+          ))}
+        </div>
+        <div className="card" style={{textAlign:'left',marginBottom:'1.5rem'}}>
+          <h3 style={{marginBottom:'.75rem'}}>📚 Deepen Your Knowledge</h3>
+          {['Compound Interest Math','50/30/20 Budgeting','Emergency Fund Strategy','Credit Score Factors','Stock Market Basics','Tax Slab Planning'].map(t=>(
+            <span key={t} className="lesson-tag">{t}</span>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:'1rem',justifyContent:'center',flexWrap:'wrap'}}>
+          <button className="btn btn-g" onClick={()=>onComplete(score*2)}>🏆 Claim {score*2} Points</button>
+          <button className="btn btn-s" onClick={onBack}>Back to Games</button>
+        </div>
+      </div>
+    );
+  }
+
+  const q = QUESTIONS[current];
+  return (
+    <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+      <div className="game-hud">
+        <div><div className="hud-v">{current+1}/10</div><div className="hud-l">Question</div></div>
+        <div><div className="hud-v" style={{color:time<=10?'var(--accent-coral)':'var(--accent-green)'}}>{time}s</div><div className="hud-l">Time</div></div>
+        <div><div className="hud-v" style={{color:'var(--accent-gold)'}}>{score}</div><div className="hud-l">Score</div></div>
+        <div style={{textAlign:'center'}}>
+          <div style={{display:'flex',gap:3,justifyContent:'center',marginBottom:2}}>
+            {QUESTIONS.map((_,i)=><div key={i} style={{width:6,height:6,borderRadius:'50%',background:i<current?'var(--accent-green)':i===current?'var(--accent-gold)':'var(--bg-surface)'}}/>)}
+          </div>
+          <div className="hud-l">Progress</div>
+        </div>
+      </div>
+      <div className="prog-wrap" style={{marginBottom:'1.5rem'}}>
+        <div className="prog-fill" style={{width:`${(time/30)*100}%`,background:time<=10?'linear-gradient(90deg,var(--accent-coral),#ff9500)':undefined,transition:'width 1s linear'}}/>
+      </div>
+      <div className="card" style={{marginBottom:'1.5rem'}}>
+        <span className="badge bb" style={{marginBottom:'.75rem',display:'inline-block'}}>{q.cat}</span>
+        <p style={{color:'var(--text-muted)',fontSize:'.85rem',marginBottom:'.5rem'}}>Question {current+1} of 10 — 10 points</p>
+        <p style={{fontSize:'1.1rem',lineHeight:'1.5',marginBottom:'1.5rem',color:'var(--text-primary)'}}>{q.q}</p>
+        {q.opts.map((opt,i)=>{
+          const letters=['A','B','C','D'];
+          let cls='choice';
+          if(answered){if(i===q.correct)cls+=' correct';else if(i===selected)cls+=' wrong';}
+          return (
+            <button key={i} className={cls} onClick={()=>handleAnswer(i)} disabled={answered}>
+              <span className="cletter">{letters[i]}</span>{opt}
+            </button>
+          );
+        })}
+        {answered && (
+          <div className={`feedback ${selected!==q.correct?'wrong':''}`}>
+            <strong>{selected===q.correct?'✅ Correct!':selected===-1?'⏰ Time\'s up!':'❌ Incorrect!'}</strong><br/>{q.exp}
+          </div>
+        )}
+      </div>
+      {answered && (
+        <div style={{display:'flex',justifyContent:'flex-end'}}>
+          <button className="btn btn-p" onClick={next}>{current<QUESTIONS.length-1?'Next Question →':'🏁 See Results'}</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// INVESTMENT SIMULATOR (simplified)
+// ═══════════════════════════════════════════════════════════
+const ASSETS = [
+  {id:'nifty',name:'Nifty 50 Index',icon:'📈',risk:'Medium',color:'#3b9eff',baseR:.015,vol:.08},
+  {id:'gold',name:'Digital Gold',icon:'🥇',risk:'Low-Med',color:'#ffd94a',baseR:.012,vol:.04},
+  {id:'crypto',name:'Bitcoin',icon:'₿',risk:'Very High',color:'#ff9500',baseR:.03,vol:.25},
+  {id:'bonds',name:'Govt Bonds',icon:'🏛️',risk:'Very Low',color:'#00e5a0',baseR:.006,vol:.005},
+  {id:'fd',name:'Fixed Deposit',icon:'🏦',risk:'None',color:'#ff6b6b',baseR:.0054,vol:0},
+];
+const EVENTS_INV = [
+  {title:'📉 Market Crash',desc:'Global recession fears hit equity markets.',eff:{nifty:-.18,gold:.10,crypto:-.35,bonds:.05,fd:0}},
+  {title:'🚀 Bull Run!',desc:'Strong economic data triggers massive rally.',eff:{nifty:.22,gold:-.05,crypto:.40,bonds:-.03,fd:0}},
+  {title:'💰 Rate Cut',desc:'RBI cuts rates, boosting real estate & equities.',eff:{nifty:.08,gold:.07,crypto:.05,bonds:-.04,fd:-.01}},
+  {title:'📊 Stable Quarter',desc:'Markets trade sideways.',eff:{nifty:.02,crypto:-.03,gold:.02,bonds:.02,fd:0}},
+  {title:'⚡ Inflation Spike',desc:'Inflation rises — gold benefits.',eff:{nifty:-.04,crypto:-.08,gold:.20,bonds:-.06,fd:-.01}},
+];
+
+const InvestmentSim = ({ onComplete, onBack }) => {
+  const [phase, setPhase] = useState('intro');
+  const [round, setRound] = useState(1);
+  const [cash, setCash] = useState(100000);
+  const [portfolio, setPortfolio] = useState({});
+  const [prices, setPrices] = useState(Object.fromEntries(ASSETS.map(a=>[a.id,100])));
+  const [inputs, setInputs] = useState({});
+  const [event, setEvent] = useState(null);
+  const [roundRet, setRoundRet] = useState({});
+  const [history, setHistory] = useState([{round:0,worth:100000}]);
+  const ROUNDS = 4;
+
+  const portfolioVal = ASSETS.reduce((s,a)=>s+(portfolio[a.id]||0)*prices[a.id],0);
+  const netWorth = cash + portfolioVal;
+
+  const invest = () => {
+    const total = Object.values(inputs).reduce((s,v)=>s+(parseFloat(v)||0),0);
+    if(total>cash) return;
+    const np = {...portfolio};
+    let nc = cash - total;
+    Object.entries(inputs).forEach(([id,amt])=>{const a=parseFloat(amt)||0;if(a>0)np[id]=(np[id]||0)+a/prices[id];});
+    setCash(nc); setPortfolio(np); setInputs({});
+    const ev = EVENTS_INV[Math.floor(Math.random()*EVENTS_INV.length)];
+    setEvent(ev); setPhase('event');
+  };
+
+  const applyEvent = () => {
+    const np = {...prices};
+    const ret = {};
+    ASSETS.forEach(a=>{
+      const r = (a.baseR + (event.eff[a.id]||0) + (Math.random()-.5)*a.vol);
+      np[a.id] = prices[a.id]*(1+r); ret[a.id]=r;
+    });
+    setPrices(np); setRoundRet(ret);
+    const pv = ASSETS.reduce((s,a)=>s+(portfolio[a.id]||0)*np[a.id],0);
+    const nw = cash + pv;
+    setHistory(h=>[...h,{round,worth:nw}]);
+    setPhase('roundResult');
+  };
+
+  const next = () => { if(round>=ROUNDS){setPhase('final');}else{setRound(r=>r+1);setPhase('invest');} };
+
+  const sell = (id) => {
+    const val = (portfolio[id]||0)*prices[id];
+    setPortfolio(p=>({...p,[id]:0}));
+    setCash(c=>c+val);
+  };
+
+  if(phase==='intro') return (
+    <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+      <button className="btn btn-s" onClick={onBack} style={{marginBottom:'1.5rem'}}>← Back</button>
+      <div style={{textAlign:'center',background:'linear-gradient(135deg,rgba(162,89,255,.1),rgba(59,158,255,.1))',border:'1px solid rgba(162,89,255,.3)',borderRadius:'var(--radius)',padding:'2rem',marginBottom:'1.5rem'}}>
+        <div style={{fontSize:'3rem',fontFamily:'var(--font-display)',fontWeight:800,color:'var(--accent-purple)'}}>₹1,00,000</div>
+        <div style={{fontSize:'.9rem',color:'var(--text-secondary)',marginTop:'.5rem'}}>Starting Capital · {ROUNDS} Rounds</div>
+      </div>
+      <h2 style={{marginBottom:'1rem'}}>📈 Investment Simulator</h2>
+      <p style={{lineHeight:'1.8',marginBottom:'1.5rem'}}>Invest across 5 asset classes over {ROUNDS} rounds. Random market events will affect your portfolio — make smart decisions to maximize wealth!</p>
+      <div className="card" style={{marginBottom:'1.5rem'}}>
+        {ASSETS.map(a=>(
+          <div key={a.id} style={{display:'flex',alignItems:'center',gap:'1rem',padding:'.65rem 0',borderBottom:'1px solid var(--border)'}}>
+            <span style={{fontSize:'1.5rem'}}>{a.icon}</span>
+            <div style={{flex:1}}><div style={{fontWeight:600,fontSize:'.9rem'}}>{a.name}</div></div>
+            <span className="badge" style={{background:a.color+'22',color:a.color,border:`1px solid ${a.color}55`}}>{a.risk}</span>
+          </div>
+        ))}
+      </div>
+      <button className="btn btn-p" onClick={()=>setPhase('invest')} style={{width:'100%',justifyContent:'center',fontSize:'1rem',padding:'1rem'}}>🚀 Start Investing</button>
+    </div>
+  );
+
+  if(phase==='invest'){
+    const alloc = Object.values(inputs).reduce((s,v)=>s+(parseFloat(v)||0),0);
+    return (
+      <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+        <div className="game-hud">
+          <div><div className="hud-v">{round}/{ROUNDS}</div><div className="hud-l">Round</div></div>
+          <div><div className="hud-v" style={{color:'var(--accent-green)'}}>₹{Math.round(cash).toLocaleString()}</div><div className="hud-l">Cash</div></div>
+          <div><div className="hud-v" style={{color:'var(--accent-purple)'}}>₹{Math.round(portfolioVal).toLocaleString()}</div><div className="hud-l">Portfolio</div></div>
+          <div><div className="hud-v" style={{color:netWorth>=100000?'var(--accent-green)':'var(--accent-coral)'}}>₹{Math.round(netWorth).toLocaleString()}</div><div className="hud-l">Net Worth</div></div>
+        </div>
+        {Object.values(portfolio).some(v=>v>0) && (
+          <div className="card" style={{marginBottom:'1rem'}}>
+            <h4 style={{marginBottom:'.75rem'}}>Current Holdings</h4>
+            {ASSETS.filter(a=>(portfolio[a.id]||0)>0).map(a=>(
+              <div key={a.id} style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'.5rem'}}>
+                <span style={{fontSize:'1.5rem'}}>{a.icon}</span>
+                <div style={{flex:1}}><div style={{fontWeight:600,fontSize:'.9rem'}}>{a.name}</div><div style={{fontSize:'.78rem',color:'var(--text-muted)'}}>₹{Math.round((portfolio[a.id]||0)*prices[a.id]).toLocaleString()}</div></div>
+                <button onClick={()=>sell(a.id)} style={{padding:'.3rem .6rem',borderRadius:8,border:'none',background:'rgba(255,107,107,.2)',color:'var(--accent-coral)',cursor:'pointer',fontSize:'.8rem',fontWeight:700}}>Sell</button>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="card" style={{marginBottom:'1rem'}}>
+          <h4 style={{marginBottom:'.75rem'}}>Invest This Round (Available: ₹{Math.round(cash-alloc).toLocaleString()})</h4>
+          {ASSETS.map(a=>(
+            <div key={a.id} style={{display:'flex',alignItems:'center',gap:'.75rem',marginBottom:'.6rem'}}>
+              <span style={{fontSize:'1.3rem'}}>{a.icon}</span>
+              <div style={{flex:1,fontSize:'.88rem',fontWeight:500}}>{a.name}</div>
+              <input type="number" min="0" placeholder="₹0" value={inputs[a.id]||''} onChange={e=>setInputs(p=>({...p,[a.id]:e.target.value}))}
+                style={{background:'var(--bg-surface)',border:'1px solid var(--border)',borderRadius:8,padding:'.35rem .6rem',color:'var(--text-primary)',fontFamily:'var(--font-body)',width:100,textAlign:'right',fontSize:'.88rem',outline:'none'}}/>
+            </div>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:'1rem',justifyContent:'center'}}>
+          <button className="btn btn-p" onClick={invest} style={{fontSize:'1rem',padding:'.875rem 2rem'}}>⏭️ Proceed to Market Event</button>
+          <button className="btn btn-s" onClick={next}>Skip Round</button>
+        </div>
+      </div>
+    );
+  }
+
+  if(phase==='event') return (
+    <div style={{maxWidth:700,margin:'0 auto',textAlign:'center'}} className="fade">
+      <div style={{fontSize:'4rem',marginBottom:'1rem',animation:'bounceIn .6s ease'}}>📰</div>
+      <span className="badge bp" style={{marginBottom:'1rem',display:'inline-block'}}>Market Event — Round {round}</span>
+      <h2 style={{marginBottom:'1rem'}}>{event?.title}</h2>
+      <p style={{lineHeight:'1.7',maxWidth:480,margin:'0 auto 2rem'}}>{event?.desc}</p>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'.5rem',marginBottom:'2rem'}}>
+        {ASSETS.map(a=>{
+          const eff=event?.eff[a.id]||0;
+          return (
+            <div key={a.id} style={{background:'var(--bg-surface)',borderRadius:'var(--radius-sm)',padding:'.75rem .5rem',textAlign:'center'}}>
+              <div style={{fontSize:'1.3rem'}}>{a.icon}</div>
+              <div style={{fontSize:'.7rem',fontWeight:600,margin:'.2rem 0'}}>{a.name.split(' ')[0]}</div>
+              <div style={{fontWeight:800,color:eff>=0?'var(--accent-green)':'var(--accent-coral)'}}>{eff>=0?'+':''}{(eff*100).toFixed(0)}%</div>
+            </div>
+          );
+        })}
+      </div>
+      <button className="btn btn-g" onClick={applyEvent} style={{fontSize:'1rem',padding:'1rem 2rem'}}>📊 See My Portfolio Results →</button>
+    </div>
+  );
+
+  if(phase==='roundResult'){
+    const prev = history[history.length-2]?.worth||100000;
+    const chg = netWorth-prev, chgP=(chg/prev)*100;
+    return (
+      <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+        <h3 style={{marginBottom:'1.5rem',textAlign:'center'}}>Round {round} Results</h3>
+        <div style={{textAlign:'center',background:'linear-gradient(135deg,rgba(162,89,255,.1),rgba(59,158,255,.1))',border:'1px solid rgba(162,89,255,.3)',borderRadius:'var(--radius)',padding:'1.5rem',marginBottom:'1.5rem'}}>
+          <div style={{fontSize:'3rem',fontFamily:'var(--font-display)',fontWeight:800,color:chg>=0?'var(--accent-green)':'var(--accent-coral)'}}>₹{Math.round(netWorth).toLocaleString()}</div>
+          <div style={{marginTop:'.5rem',fontWeight:700,color:chg>=0?'var(--accent-green)':'var(--accent-coral)'}}>
+            {chg>=0?'▲':'▼'} ₹{Math.abs(Math.round(chg)).toLocaleString()} ({chgP.toFixed(1)}%)
+          </div>
+        </div>
+        <div className="card" style={{marginBottom:'1.5rem'}}>
+          <h4 style={{marginBottom:'1rem'}}>Asset Performance</h4>
+          {ASSETS.map(a=>{const r=roundRet[a.id]||0;return(
+            <div key={a.id} style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'.5rem',opacity:(portfolio[a.id]||0)>0?1:.5}}>
+              <span style={{fontSize:'1.3rem'}}>{a.icon}</span>
+              <div style={{flex:1,fontWeight:600,fontSize:'.88rem'}}>{a.name}</div>
+              <span style={{fontWeight:800,color:r>=0?'var(--accent-green)':'var(--accent-coral)'}}>{r>=0?'+':''}{(r*100).toFixed(1)}%</span>
+            </div>
+          );})}
+        </div>
+        <div style={{textAlign:'center'}}><button className="btn btn-p" onClick={next} style={{fontSize:'1rem',padding:'1rem 2rem'}}>{round<ROUNDS?`▶ Round ${round+1}`:'🏁 Final Results'}</button></div>
+      </div>
+    );
+  }
+
+  if(phase==='final'){
+    const gain = netWorth-100000, gp=(gain/100000)*100;
+    const gd = gp>=25?{g:'A',l:'Investment Genius! 🧠',pts:200,c:'var(--accent-green)'}:gp>=12?{g:'B',l:'Smart Investor 📈',pts:150,c:'var(--accent-blue)'}:gp>=0?{g:'C',l:'Safe Player 🛡️',pts:100,c:'var(--accent-gold)'}:{g:'D',l:'High Risk Taker 😬',pts:50,c:'var(--accent-coral)'};
+    return (
+      <div className="result-screen fade">
+        <div className="trophy">💎</div>
+        <h2>Investment Challenge Complete!</h2>
+        <div className="score-big" style={{color:gd.c}}>₹{Math.round(netWorth).toLocaleString()}</div>
+        <div className="grade-badge" style={{background:gd.c+'22',color:gd.c,border:`1px solid ${gd.c}`}}>{gd.g} — {gd.l}</div>
+        <div className="analysis">
+          {[['Starting',`₹1,00,000`,'var(--text-primary)'],['Final Worth',`₹${Math.round(netWorth).toLocaleString()}`,gd.c],['Gain/Loss',`${gain>=0?'+':''}₹${Math.abs(Math.round(gain)).toLocaleString()}`,gain>=0?'var(--accent-green)':'var(--accent-coral)'],['Return',`${gp.toFixed(1)}%`,gd.c]].map(([l,v,c])=>(
+            <div key={l} className="a-item"><div className="a-label">{l}</div><div className="a-val" style={{color:c}}>{v}</div></div>
+          ))}
+        </div>
+        <div className="card" style={{textAlign:'left',marginBottom:'1.5rem'}}>
+          <h3 style={{marginBottom:'.75rem'}}>📚 Investment Topics to Master</h3>
+          {['Asset Allocation & Diversification','Risk vs Return','Market Volatility & Psychology','Compound Returns','Portfolio Rebalancing'].map(t=><span key={t} className="lesson-tag">{t}</span>)}
+        </div>
+        <div style={{display:'flex',gap:'1rem',justifyContent:'center',flexWrap:'wrap'}}>
+          <button className="btn btn-g" onClick={()=>onComplete(gd.pts)}>🏆 Claim {gd.pts} Points</button>
+          <button className="btn btn-s" onClick={onBack}>Back to Games</button>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// ═══════════════════════════════════════════════════════════
+// LIFE SIMULATOR GAME (compact version)
+// ═══════════════════════════════════════════════════════════
+const STAGES_DATA = [
+  {id:'student',title:'Stage 1: Student Life',emoji:'🎓',color:'#3b9eff',scenes:[
+    {q:'You receive ₹30,000 scholarship but fees are ₹80,000. How to fund the remaining ₹50,000?',opts:['Education loan at 8% — tax deductible and low interest','Ask parents to pay it all — avoid any responsibility','High-interest loan at 24% from private lender','Use emergency savings meant for medical needs'],correct:0,exp:'Education loans offer lowest interest & tax benefits (Sec 80E). Draining emergency savings is risky.'},
+    {q:'A café offers ₹8,000/month part-time job. Should you take it?',opts:['Yes — build independence and save 50% of earnings','Reject it — grades come first, money doesn\'t matter now','Take it and spend all on lifestyle upgrades','Look for a field-related internship instead'],correct:3,exp:'Field internships build both income and career skills. Part-time work is also good if internships aren\'t available.'},
+    {q:'Friends buy iPhone at ₹85,000. You have ₹20,000 savings. Your move?',opts:['Buy on EMI — everyone has it, need it socially','Wait 6 months, save specifically for it, zero debt','Buy previous model (₹45,000) — better value','Drain all savings and buy now — YOLO'],correct:2,exp:'Buying a slightly older model gives excellent value. Draining emergency savings for luxuries is financially dangerous.'},
+  ],topics:['Needs vs Wants','Education Loans','Lifestyle Inflation','Building Savings Habits']},
+  {id:'firstjob',title:'Stage 2: First Job',emoji:'💼',color:'#00e5a0',scenes:[
+    {q:'First salary of ₹55,000 arrives. How do you handle it?',opts:['Transfer 20% to savings first, celebrate modestly','Celebrate lavishly — you worked hard, save next month','Invest everything in PPF — skip celebration','Start 5 SIPs at ₹1,000 each, clear pending dues first'],correct:3,exp:'"Pay yourself first" is the golden rule. Systematic SIPs build wealth. Starting multiple small investments early is powerful.'},
+    {q:'HR asks: increase PF from 12% to 20% (reduces take-home by ₹4,400). What do you decide?',opts:['Increase it — 8.15% guaranteed return, great long-term','Keep at 12% — need more take-home for expenses','Opt out of PF entirely — mutual funds are better','Increase but reduce other savings proportionally'],correct:0,exp:'EPF gives one of India\'s best guaranteed returns (8.15%) with tax benefits. Compounding over years is extremely valuable.'},
+  ],topics:['EPF and Tax Saving','Pay Yourself First','SIP Investing','Rent vs Own Decision']},
+  {id:'startup',title:'Stage 3: Startup Founder',emoji:'🚀',color:'#a259ff',scenes:[
+    {q:'Angel investor offers ₹50L for 25% equity. Bank offers ₹40L loan at 14%. You\'re pre-revenue. Choose:',opts:['Angel investment — no debt obligation, brings mentorship','Bank loan — retain 100% equity and full control','Negotiate with angel — offer 15% for same amount','Bootstrap — reject all external funding'],correct:0,exp:'For pre-revenue startups, equity beats debt — no repayment pressure when cash flow is uncertain. Angel also brings mentorship.'},
+    {q:'Burn rate is ₹8L/month, runway 40L. A client offers ₹5L for custom features not in roadmap. Decision?',opts:['Accept — reduces burn and validates product','Reject — custom work distracts from core product','Accept but negotiate ₹8L — covers one full month burn','Cut team by 30% regardless'],correct:2,exp:'Negotiating more money is smartest. Custom features at higher price reduce burn more. Team cuts hurt productivity and morale.'},
+  ],topics:['Startup Funding & Equity','Burn Rate & Runway','Unit Economics','Path to Profitability']},
+];
+
+const LifeSimulator = ({ onComplete, onBack }) => {
+  const [stageIdx, setStageIdx] = useState(null);
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+
+  const stage = stageIdx!==null ? STAGES_DATA[stageIdx] : null;
+  const scene = stage ? stage.scenes[sceneIdx] : null;
+
+  const reset = (idx) => { setStageIdx(idx);setSceneIdx(0);setSelected(null);setAnswered(false);setScore(0);setDone(false); };
+
+  const answer = (i) => {
+    if(answered)return;
+    setSelected(i); setAnswered(true);
+    if(i===scene.correct) setScore(s=>s+10);
+  };
+
+  const next = () => {
+    if(sceneIdx<stage.scenes.length-1){setSceneIdx(s=>s+1);setSelected(null);setAnswered(false);}
+    else{setDone(true);}
+  };
+
+  if(stageIdx===null) return (
+    <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+      <button className="btn btn-s" onClick={onBack} style={{marginBottom:'1.5rem'}}>← Back to Games</button>
+      <h2 style={{marginBottom:'.5rem'}}>🎭 Life Financial Simulator</h2>
+      <p style={{marginBottom:'1.5rem'}}>Walk through financial life stages. Make smart decisions, earn points, and learn!</p>
+      {STAGES_DATA.map((s,i)=>(
+        <div key={s.id} className="card" style={{display:'flex',alignItems:'center',gap:'1.5rem',cursor:'pointer',marginBottom:'1rem'}} onClick={()=>reset(i)}>
+          <div style={{fontSize:'3rem'}}>{s.emoji}</div>
+          <div style={{flex:1}}>
+            <h3 style={{marginBottom:'.25rem'}}>{s.title}</h3>
+            <p style={{fontSize:'.85rem'}}>{s.scenes.length} scenarios · Up to {s.scenes.length*10} points</p>
+          </div>
+          <button className="btn btn-p">Start</button>
+        </div>
+      ))}
+    </div>
+  );
+
+  if(done){
+    const pct = Math.round(score/(stage.scenes.length*10)*100);
+    const g = pct>=85?'A':pct>=65?'B':pct>=45?'C':'D';
+    const gc = {A:'var(--accent-green)',B:'var(--accent-blue)',C:'var(--accent-gold)',D:'var(--accent-coral)'}[g];
+    return (
+      <div className="result-screen fade">
+        <div className="trophy">{g==='A'?'🏆':g==='B'?'🥈':'🎯'}</div>
+        <h2>{stage.title} — Complete!</h2>
+        <div className="score-big" style={{color:gc}}>{pct}%</div>
+        <div className="grade-badge" style={{background:gc+'22',color:gc,border:`1px solid ${gc}`}}>Grade {g} — {g==='A'?'Financial Expert!':g==='B'?'Smart Thinker':'Keep Learning'}</div>
+        <div className="analysis">
+          {[['Score',`${score}/${stage.scenes.length*10}`,'var(--accent-green)'],['Points',`⭐ ${score*5}`,'var(--accent-gold)'],['Stage',stage.emoji+' '+stage.id,'var(--text-primary)'],['IQ',pct>=85?'🧠 Excellent':pct>=65?'📈 Good':'📚 Developing','var(--text-primary)']].map(([l,v,c])=>(
+            <div key={l} className="a-item"><div className="a-label">{l}</div><div className="a-val" style={{color:c}}>{v}</div></div>
+          ))}
+        </div>
+        <div className="card" style={{textAlign:'left',marginBottom:'1.5rem'}}>
+          <h3 style={{marginBottom:'.75rem'}}>📚 Related Topics</h3>
+          {stage.topics.map(t=><span key={t} className="lesson-tag">{t}</span>)}
+        </div>
+        <div style={{display:'flex',gap:'1rem',justifyContent:'center',flexWrap:'wrap'}}>
+          <button className="btn btn-g" onClick={()=>onComplete(score*5)}>🏆 Claim {score*5} Points</button>
+          <button className="btn btn-s" onClick={()=>setStageIdx(null)}>← Stages</button>
+          <button className="btn btn-s" onClick={onBack}>Back to Games</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{maxWidth:700,margin:'0 auto'}} className="fade">
+      <div style={{display:'flex',gap:'.75rem',alignItems:'center',marginBottom:'1rem',flexWrap:'wrap'}}>
+        <button className="btn btn-s" onClick={()=>setStageIdx(null)}>← Stages</button>
+        <span className="badge bp">{stage.title}</span>
+      </div>
+      <div className="game-hud">
+        <div><div className="hud-v">{sceneIdx+1}/{stage.scenes.length}</div><div className="hud-l">Scene</div></div>
+        <div><div className="hud-v" style={{color:'var(--accent-gold)'}}>{score}</div><div className="hud-l">Score</div></div>
+        <div><div style={{fontSize:'2rem'}}>{stage.emoji}</div><div className="hud-l">Stage</div></div>
+      </div>
+      <div className="card" style={{marginBottom:'1rem'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'.75rem',marginBottom:'1rem'}}>
+          <div style={{fontSize:'2.5rem'}}>💭</div>
+          <p style={{fontSize:'1.05rem',lineHeight:'1.5',color:'var(--text-primary)',fontWeight:500}}>{scene.q}</p>
+        </div>
+        {scene.opts.map((opt,i)=>{
+          const letters=['A','B','C','D'];
+          let cls='choice';
+          if(answered){if(i===scene.correct)cls+=' correct';else if(i===selected)cls+=' wrong';}
+          return <button key={i} className={cls} onClick={()=>answer(i)} disabled={answered}>
+            <span className="cletter">{letters[i]}</span>{opt}
+          </button>;
+        })}
+        {answered && <div className={`feedback ${selected!==scene.correct?'wrong':''}`}><strong>{selected===scene.correct?'✅ Smart choice!':'❌ Not optimal!'}</strong><br/>{scene.exp}</div>}
+      </div>
+      {answered && <div style={{display:'flex',justifyContent:'flex-end'}}><button className="btn btn-p" onClick={next}>{sceneIdx<stage.scenes.length-1?'Next Scene →':'🏁 See Results'}</button></div>}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// GAMES HUB
+// ═══════════════════════════════════════════════════════════
+const GAME_LIST = [
+  {id:'budget',title:'Budget Builder',desc:'Allocate monthly income across expenses and get scored.',icon:'💰',color:'#00e5a0',pts:'50–150 pts',diff:'Beginner'},
+  {id:'quiz',title:'Finance Quiz',desc:'10 timed questions on budgeting, investing, taxes & more!',icon:'🧠',color:'#ffd94a',pts:'20–200 pts',diff:'Mixed'},
+  {id:'invest',title:'Investment Simulator',desc:'Invest ₹1,00,000 across assets over 4 rounds with market events.',icon:'📈',color:'#3b9eff',pts:'50–200 pts',diff:'Advanced'},
+  {id:'life',title:'Life Simulator',desc:'3 life stages — Student, First Job, Startup. Make smart financial decisions!',icon:'🎭',color:'#a259ff',pts:'50–150 pts',diff:'Intermediate'},
+];
+
+const Games = ({ navigate }) => {
+  const { addPoints, markComplete, userProfile } = useAuth();
+  const [active, setActive] = useState(null);
+  const [showToast, Toast] = useToast();
+  const completed = userProfile?.completedGames||[];
+
+  const handleComplete = async (pts, gameId) => {
+    const id = gameId || active;
+    await addPoints(pts);
+    await markComplete('game', id||active);
+    showToast(`🎉 You earned ${pts} points!`);
+    setActive(null);
+  };
+
+  if(active==='budget') return <BudgetBuilder onComplete={p=>handleComplete(p,'budget')} onBack={()=>setActive(null)}/>;
+  if(active==='quiz') return <FinanceQuiz onComplete={p=>handleComplete(p,'quiz')} onBack={()=>setActive(null)}/>;
+  if(active==='invest') return <InvestmentSim onComplete={p=>handleComplete(p,'invest')} onBack={()=>setActive(null)}/>;
+  if(active==='life') return <LifeSimulator onComplete={p=>handleComplete(p,'life')} onBack={()=>setActive(null)}/>;
+
+  return (
+    <div className="fade">
+      <div style={{marginBottom:'2rem'}}><h2>🎮 Games</h2><p>Learn financial skills through interactive games. Earn points and improve your financial IQ!</p></div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:'1.25rem'}}>
+        {GAME_LIST.map(game=>{
+          const played = completed.includes(game.id);
+          return (
+            <div key={game.id} className="card" style={{cursor:'pointer',overflow:'hidden',padding:0,border:played?'1px solid var(--accent-green)':'1px solid var(--border)'}} onClick={()=>setActive(game.id)}>
+              <div style={{height:140,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'4.5rem',background:`linear-gradient(135deg,${game.color}22,${game.color}08)`,position:'relative'}}>
+                {game.icon}
+                {played && <div style={{position:'absolute',top:'.75rem',right:'.75rem',background:'rgba(0,229,160,.9)',borderRadius:'100px',padding:'.2rem .6rem',fontSize:'.75rem',fontWeight:700,color:'#000'}}>✅ Played</div>}
+              </div>
+              <div style={{padding:'1.2rem'}}>
+                <div style={{display:'flex',gap:'.5rem',marginBottom:'.5rem',flexWrap:'wrap'}}>
+                  <span className={`badge ${game.diff==='Beginner'?'bg':game.diff==='Advanced'?'bb':game.diff==='Intermediate'?'bp':'bgo'}`}>{game.diff}</span>
+                </div>
+                <h3 style={{marginBottom:'.4rem'}}>{game.title}</h3>
+                <p style={{fontSize:'.85rem',lineHeight:'1.6'}}>{game.desc}</p>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:'1rem'}}>
+                  <span style={{color:'var(--accent-gold)',fontSize:'.85rem',fontWeight:600}}>⭐ {game.pts}</span>
+                  <button className="btn btn-p" style={{padding:'.5rem 1rem',fontSize:'.85rem'}}>{played?'▶ Replay':'▶ Play'}</button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <Toast/>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// SHOP
+// ═══════════════════════════════════════════════════════════
+const SHOP_ITEMS = [
+  {id:'s_rocket',name:'Rocket Sticker',icon:'🚀',cat:'Sticker',cost:100},
+  {id:'s_diamond',name:'Diamond Sticker',icon:'💎',cat:'Sticker',cost:150},
+  {id:'s_fire',name:'Fire Sticker',icon:'🔥',cat:'Sticker',cost:80},
+  {id:'a_dragon',name:'Dragon Avatar',icon:'🐉',cat:'Avatar',cost:200},
+  {id:'a_unicorn',name:'Unicorn Avatar',icon:'🦄',cat:'Avatar',cost:250},
+  {id:'a_eagle',name:'Eagle Avatar',icon:'🦅',cat:'Avatar',cost:180},
+  {id:'a_crown',name:'Crown Avatar',icon:'👑',cat:'Avatar',cost:300},
+  {id:'b_wolf',name:'Wall St. Wolf',icon:'🐺',cat:'Badge',cost:350},
+  {id:'b_guru',name:'Finance Guru',icon:'🧘',cat:'Badge',cost:400},
+  {id:'b_legend',name:'FinQuest Legend',icon:'🌟',cat:'Badge',cost:500},
+];
+
+const Shop = () => {
+  const { userProfile, purchaseItem } = useAuth();
+  const [cat, setCat] = useState('All');
+  const [showToast, Toast] = useToast();
+  const pts = userProfile?.points||0, owned = userProfile?.purchasedItems||[];
+
+  const buy = async (item) => {
+    if(owned.includes(item.id)){showToast('Already owned!');return;}
+    if(pts<item.cost){showToast(`❌ Need ${item.cost-pts} more points.`);return;}
+    const ok = await purchaseItem(item);
+    if(ok) showToast(`✅ Purchased "${item.name}"!`);
+  };
+
+  const filtered = cat==='All' ? SHOP_ITEMS : SHOP_ITEMS.filter(i=>i.cat===cat);
+
+  return (
+    <div className="fade">
+      <div style={{marginBottom:'2rem'}}><h2>🛒 Shop</h2><p>Spend your hard-earned points on exclusive items!</p></div>
+      <div className="card" style={{display:'flex',alignItems:'center',gap:'1.5rem',marginBottom:'1.5rem',background:'linear-gradient(135deg,rgba(255,217,74,.1),rgba(255,170,0,.05))'}}>
+        <div style={{fontSize:'3rem'}}>⭐</div>
+        <div>
+          <div style={{fontFamily:'var(--font-display)',fontSize:'2.2rem',fontWeight:800}} className="gold-text">{pts.toLocaleString()}</div>
+          <div style={{fontSize:'.85rem',color:'var(--text-secondary)'}}>Points Available</div>
+        </div>
+        <div style={{marginLeft:'auto',textAlign:'right'}}>
+          <div style={{fontWeight:700,color:'var(--accent-green)'}}>{owned.length} items owned</div>
+          <div style={{fontSize:'.78rem',color:'var(--text-muted)'}}>Play games to earn more</div>
+        </div>
+      </div>
+      <div style={{display:'flex',gap:'.5rem',marginBottom:'1.5rem',flexWrap:'wrap'}}>
+        {['All','Sticker','Avatar','Badge'].map(c=>(
+          <button key={c} className={`btn ${cat===c?'btn-p':'btn-s'}`} style={{padding:'.5rem 1.25rem',fontSize:'.85rem'}} onClick={()=>setCat(c)}>{c}</button>
+        ))}
+      </div>
+      <div className="shop-grid">
+        {filtered.map(item=>{
+          const io = owned.includes(item.id), ca = pts>=item.cost;
+          return (
+            <div key={item.id} className={`shop-item ${io?'owned':''}`} onClick={()=>buy(item)} style={{opacity:!io&&!ca?.6:1}}>
+              <div style={{fontSize:'3rem',marginBottom:'.75rem'}}>{item.icon}</div>
+              <div style={{fontWeight:600,fontSize:'.9rem',marginBottom:'.2rem'}}>{item.name}</div>
+              <div style={{fontSize:'.75rem',color:'var(--text-muted)',marginBottom:'.5rem'}}>{item.cat}</div>
+              {io ? <div style={{color:'var(--accent-green)',fontWeight:700,fontSize:'.9rem'}}>✅ Owned</div>
+                   : <div style={{color:ca?'var(--accent-gold)':'var(--accent-coral)',fontWeight:700,fontSize:'.9rem'}}>⭐ {item.cost} pts</div>}
+            </div>
+          );
+        })}
+      </div>
+      <Toast/>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════════════════════
+const MOCK_LB = [
+  {displayName:'InvestorPro99',avatar:'🐉',points:4850,level:10},
+  {displayName:'BudgetQueen',avatar:'👑',points:4210,level:9},
+  {displayName:'WealthWizard',avatar:'🧘',points:3780,level:8},
+  {displayName:'StockMaster',avatar:'🤖',points:3420,level:7},
+  {displayName:'FrugalFox',avatar:'🦊',points:2900,level:6},
+  {displayName:'PortfolioKing',avatar:'🦁',points:2500,level:6},
+  {displayName:'SavingsStar',avatar:'🌟',points:2200,level:5},
+  {displayName:'FinanceNerd42',avatar:'🐼',points:1950,level:5},
+];
+const MEDALS = {0:'🥇',1:'🥈',2:'🥉'};
+
+const Leaderboard = () => {
+  const { userProfile } = useAuth();
+  const myEntry = {displayName:userProfile?.displayName||'You',avatar:userProfile?.avatar||'🦊',points:userProfile?.points||0,level:userProfile?.level||1,isMe:true};
+  const all = [...MOCK_LB,myEntry].sort((a,b)=>b.points-a.points).slice(0,10);
+  const myRank = all.findIndex(u=>u.isMe)+1;
+
+  return (
+    <div className="fade">
+      <div style={{marginBottom:'2rem'}}><h2>🏆 Leaderboard</h2><p>Top FinQuest players ranked by points.</p></div>
+      {myRank>0 && (
+        <div className="card" style={{display:'flex',alignItems:'center',gap:'1.5rem',marginBottom:'1.5rem',background:'linear-gradient(135deg,rgba(0,229,160,.08),rgba(59,158,255,.08))'}}>
+          <div style={{fontSize:'2.5rem'}}>{MEDALS[myRank-1]||`#${myRank}`}</div>
+          <div>
+            <div style={{fontWeight:700}}>Your Rank: <span className="gt">#{myRank}</span></div>
+            <div style={{fontSize:'.85rem',color:'var(--text-secondary)'}}>{(userProfile?.points||0).toLocaleString()} points · Level {userProfile?.level||1}</div>
+          </div>
+          <div style={{marginLeft:'auto'}}><span className={`badge ${myRank<=3?'bgo':myRank<=10?'bb':'bg'}`}>{myRank<=3?'🌟 Top 3!':myRank<=10?'Top 10':'Keep climbing!'}</span></div>
+        </div>
+      )}
+      <div>
+        {all.map((u,i)=>(
+          <div key={i} className={`leader-row ${u.isMe?'leader-self':''}`}>
+            <div style={{fontFamily:'var(--font-display)',fontSize:'1.3rem',fontWeight:800,width:'2rem',textAlign:'center',color:i===0?'var(--accent-gold)':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text-muted)'}}>
+              {MEDALS[i]||i+1}
+            </div>
+            <div style={{fontSize:'1.8rem'}}>{u.avatar||'🦊'}</div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:600}}>{u.displayName}{u.isMe&&<span className="badge bg" style={{marginLeft:'.5rem',fontSize:'.7rem'}}>You</span>}</div>
+              <div style={{fontSize:'.78rem',color:'var(--text-muted)'}}>Level {u.level||1}</div>
+            </div>
+            <div style={{fontFamily:'var(--font-display)',fontWeight:800,color:'var(--accent-green)'}}>⭐ {(u.points||0).toLocaleString()}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════
+// ROOT APP
+// ═══════════════════════════════════════════════════════════
+const AppInner = () => {
+  const { currentUser } = useAuth();
+  const [page, setPage] = useState('landing');
+  const nav = (to) => setPage(to);
+
+  if(!currentUser){
+    if(page==='login') return <Login navigate={nav}/>;
+    if(page==='signup') return <Signup navigate={nav}/>;
+    return <LandingPage navigate={nav}/>;
+  }
+
+  const render = () => {
+    switch(page){
+      case 'dashboard': return <Dashboard navigate={nav}/>;
+      case 'profile':   return <Profile navigate={nav}/>;
+      case 'lessons':   return <Lessons navigate={nav}/>;
+      case 'games':     return <Games navigate={nav}/>;
+      case 'shop':      return <Shop navigate={nav}/>;
+      case 'leaderboard': return <Leaderboard navigate={nav}/>;
+      default:          return <Dashboard navigate={nav}/>;
+    }
+  };
+
+  return (
+    <div className="app">
+      <Navbar page={page} navigate={nav}/>
+      <main className="main fade">{render()}</main>
+    </div>
+  );
+};
+
+const App = () => (
+  <AuthProvider>
+    <AppInner/>
+  </AuthProvider>
+);
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
