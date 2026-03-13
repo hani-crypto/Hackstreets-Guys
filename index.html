@@ -125,7 +125,7 @@ p{color:var(--text-secondary)}
 <script type="text/babel">
 const { useState, useEffect, useContext, createContext, useRef } = React;
 
-// ── Mock Auth Context (no Firebase needed for demo) ──────────
+// ── Local Storage Auth Context (Bypasses Backend) ──────────
 const AuthCtx = createContext();
 const useAuth = () => useContext(AuthCtx);
 
@@ -134,56 +134,81 @@ const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
 
   const defaultProfile = (name) => ({
-    displayName: name, avatar: '🦊', points: 200, level: 1,
+    displayName: name, avatar: '🦊', points: 0, level: 1,
     badges: [], purchasedItems: [], completedGames: [], completedLessons: [], joinedAt: new Date().toISOString()
   });
 
-  const signup = (email, password, name) => {
+  const saveToLocal = (email, data) => {
+    localStorage.setItem('finquest_' + email, JSON.stringify(data));
+  };
+
+  const signup = async (email, password, name) => {
     const profile = defaultProfile(name);
     setCurrentUser({ email, uid: 'demo-' + Date.now() });
     setUserProfile(profile);
+    saveToLocal(email, profile); 
     return Promise.resolve();
   };
 
-  const login = (email, password) => {
-    const profile = defaultProfile('Demo Player');
+  const login = async (email, password) => {
     setCurrentUser({ email, uid: 'demo-user' });
-    setUserProfile({ ...profile, points: 350, level: 1, completedLessons: ['budgeting-basics'] });
+    const savedData = localStorage.getItem('finquest_' + email);
+    
+    if (savedData) {
+        setUserProfile(JSON.parse(savedData)); 
+    } else {
+        const newProf = defaultProfile('Player');
+        setUserProfile(newProf);
+        saveToLocal(email, newProf);
+    }
     return Promise.resolve();
   };
 
   const logout = () => { setCurrentUser(null); setUserProfile(null); return Promise.resolve(); };
 
-  const addPoints = (pts) => {
+  const addPoints = async (pts) => {
     setUserProfile(p => {
-      const np = (p.points || 0) + pts;
-      return { ...p, points: np, level: Math.floor(np / 500) + 1 };
+      const newPoints = (p.points || 0) + pts;
+      const newLevel = Math.floor(newPoints / 500) + 1;
+      const updated = { ...p, points: newPoints, level: newLevel };
+      if (currentUser?.email) saveToLocal(currentUser.email, updated);
+      return updated;
     });
     return Promise.resolve();
   };
 
-  const updateProfileData = (data) => {
-    setUserProfile(p => ({ ...p, ...data }));
+  const updateProfileData = async (data) => {
+    setUserProfile(p => {
+        const updated = { ...p, ...data };
+        if (currentUser?.email) saveToLocal(currentUser.email, updated);
+        return updated;
+    });
     return Promise.resolve();
   };
 
-  const markComplete = (type, id) => {
+  const markComplete = async (type, id) => {
     const field = type === 'lesson' ? 'completedLessons' : 'completedGames';
     setUserProfile(p => {
       const cur = p[field] || [];
       if (cur.includes(id)) return p;
-      return { ...p, [field]: [...cur, id] };
+      const updated = { ...p, [field]: [...cur, id] };
+      if (currentUser?.email) saveToLocal(currentUser.email, updated);
+      return updated;
     });
     return Promise.resolve();
   };
 
-  const purchaseItem = (item) => {
+  const purchaseItem = async (item) => {
     if ((userProfile?.points || 0) < item.cost) return Promise.resolve(false);
-    setUserProfile(p => ({
-      ...p,
-      points: p.points - item.cost,
-      purchasedItems: [...(p.purchasedItems || []), item.id]
-    }));
+    setUserProfile(p => {
+      const updated = {
+        ...p,
+        points: p.points - item.cost,
+        purchasedItems: [...(p.purchasedItems || []), item.id]
+      };
+      if (currentUser?.email) saveToLocal(currentUser.email, updated);
+      return updated;
+    });
     return Promise.resolve(true);
   };
 
@@ -705,13 +730,13 @@ const BudgetBuilder = ({ onComplete, onBack }) => {
   const [values, setValues] = useState({});
   const [result, setResult] = useState(null);
 
-  const total = SCENARIO.categories.reduce((s,c)=>s+(parseInt(values[c.key])||0),0);
+  const total = SCENARIO.categories.reduce((s,c)=>s+(Number(values[c.key])||0),0);
   const remaining = SCENARIO.income - total;
 
   const evaluate = () => {
     let score = 0, fb = [];
     SCENARIO.categories.forEach(cat=>{
-      const v = parseInt(values[cat.key])||0, [mn,mx] = cat.ideal;
+      const v = Number(values[cat.key])||0, [mn,mx] = cat.ideal;
       if(v>=mn&&v<=mx){score+=20;fb.push({status:'good',msg:`✅ Great: ${cat.label.split(' ')[1]} allocation is ideal!`})}
       else if(v<mn){score+=5;fb.push({status:'low',msg:`⚠️ ${cat.label.split(' ')[1]} too low. Ideal: ₹${mn.toLocaleString()}–${mx.toLocaleString()}`})}
       else{fb.push({status:'high',msg:`❌ Overspending on ${cat.label.split(' ')[1]}. Ideal: ₹${mn.toLocaleString()}–${mx.toLocaleString()}`})}
