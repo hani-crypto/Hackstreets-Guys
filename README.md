@@ -19,13 +19,9 @@ FinQuest uses gamification and interactive simulations to teach finance concepts
 Users can:
 
 📚 Learn financial concepts through short lessons
-
 🎮 Play interactive finance games
-
 🏆 Earn points and rewards
-
 📊 Track learning progress
-
 🛒 Spend points in the avatar shop
 
 This approach encourages active learning rather than passive reading.
@@ -34,17 +30,11 @@ This approach encourages active learning rather than passive reading.
 📚 Interactive Lessons
 
 Users can access bite-sized lessons on important financial topics such as:
-
 Budgeting
-
 Investing
-
 Saving
-
 Credit & debt management
-
 Taxes
-
 Financial planning
 
 Each lesson can also be downloaded as PDF notes.
@@ -53,39 +43,24 @@ Each lesson can also be downloaded as PDF notes.
 💰 Budget Builder
 
 Players allocate income across expenses and learn:
-
 Expense management
-
 Budget optimization
-
 Financial planning
 
 🧠 Finance Quiz
-
 A timed quiz with questions about:
-
 Investing
-
 Savings
-
 Taxes
-
 Budgeting
-
 Credit scores
 
 📈 Investment Simulator
 
 Players invest virtual money across different assets:
-
 Stocks
-
-Gold
-
 Crypto
-
 Bonds
-
 Fixed deposits
 
 Random market events affect their portfolio, teaching risk management and diversification.
@@ -95,10 +70,9 @@ Random market events affect their portfolio, teaching risk management and divers
 A decision-based game where users make financial choices through life stages:
 
 Student life
-
 First job
-
 Startup founder
+Grocery Store , etc.
 
 This helps users understand real-world financial decision making.
 
@@ -107,23 +81,16 @@ This helps users understand real-world financial decision making.
 FinQuest keeps users engaged using:
 
 ⭐ Points system
-
 📊 Levels and progress tracking
-
 🏅 Achievements
-
 🏆 Leaderboards
-
 🛒 Reward shop
-
 🛒 Avatar Shop
 
 Users can spend earned points to unlock:
 
 Stickers
-
 Avatars
-
 Badges
 
 This adds a fun reward-driven learning loop.
