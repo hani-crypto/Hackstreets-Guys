@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>FinQuest – Gamified Financial Education</title>
@@ -125,17 +123,6 @@ p{color:var(--text-secondary)}
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script type="text/babel">
-  const firebaseConfig = {
-  apiKey: "AIzaSyD84XFjt4MawIZvR5-N9PBT1ihvtsMydA",
-  authDomain: "finquest1.firebaseapp.com",
-  projectId: "finquest1",
-  storageBucket: "finquest1.firebasestorage.app",
-  messagingSenderId: "390666239301",
-  appId: "1:390666239301:web:1e190b2c3789f98f82522c",
-  measurementId: "G-DTCQLEHFM5"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 const { useState, useEffect, useContext, createContext, useRef } = React;
 
 // ── Mock Auth Context (no Firebase needed for demo) ──────────
@@ -170,16 +157,6 @@ const AuthProvider = ({ children }) => {
   const addPoints = (pts) => {
     setUserProfile(p => {
       const np = (p.points || 0) + pts;
-      
-      // THIS IS THE MAGIC LINE: It updates your Firefox/Firebase vault!
-      db.collection('users').doc('4IIGVKLTOPnUXAKvOD10').update({
-        points: np
-      }).then(() => {
-        console.log("✅ Cloud Vault Updated Successfully!");
-      }).catch((error) => {
-        console.error("❌ Vault Error:", error);
-      });
-
       return { ...p, points: np, level: Math.floor(np / 500) + 1 };
     });
     return Promise.resolve();
